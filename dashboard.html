@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veterinary Communication Analysis Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --bg-primary: #f0f2f5;
+            --bg-card: #ffffff;
+            --bg-header: #1a2332;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --text-on-dark: #ffffff;
+            --accent: #4C72B0;
+            --positive: #28a745;
+            --negative: #dc3545;
+            --warning: #ffc107;
+            --gap: 16px;
+            --radius: 10px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+        .dashboard-container { max-width: 1440px; margin: 0 auto; padding: var(--gap); }
+        .dashboard-header {
+            background: var(--bg-header);
+            color: var(--text-on-dark);
+            padding: 24px 28px;
+            border-radius: var(--radius);
+            margin-bottom: var(--gap);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .dashboard-header h1 { font-size: 22px; font-weight: 700; }
+        .dashboard-header .subtitle { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+        .filters { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .filter-group { display: flex; align-items: center; gap: 6px; }
+        .filter-group label { font-size: 12px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.5px; }
+        .filter-group select {
+            padding: 6px 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.1);
+            color: var(--text-on-dark);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .filter-group select option { background: var(--bg-header); color: var(--text-on-dark); }
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: var(--gap);
+            margin-bottom: var(--gap);
+        }
+        .kpi-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+        }
+        .kpi-card.blue::before { background: #4C72B0; }
+        .kpi-card.red::before { background: #dc3545; }
+        .kpi-card.green::before { background: #28a745; }
+        .kpi-card.orange::before { background: #DD8452; }
+        .kpi-card.purple::before { background: #8172B3; }
+        .kpi-card.teal::before { background: #17a2b8; }
+        .kpi-card.gold::before { background: #ffc107; }
+        .kpi-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; font-weight: 600; }
+        .kpi-value { font-size: 30px; font-weight: 800; color: var(--text-primary); }
+        .kpi-sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--gap);
+            margin-bottom: var(--gap);
+        }
+        .chart-row.three-col { grid-template-columns: repeat(3, 1fr); }
+        .chart-row.full { grid-template-columns: 1fr; }
+        .chart-container {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .chart-container h3 { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; }
+        .chart-container canvas { max-height: 300px; }
+        .chart-container.tall canvas { max-height: 400px; }
+        .section-header {
+            font-size: 16px; font-weight: 700; color: var(--text-primary);
+            margin: 24px 0 12px; padding-left: 4px;
+            border-left: 4px solid var(--accent);
+            padding-left: 12px;
+        }
+        .strengths-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 10px;
+            margin-bottom: var(--gap);
+        }
+        .strength-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .strength-name { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .strength-score { font-size: 24px; font-weight: 700; }
+        .strength-bar { height: 6px; background: #e9ecef; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+        .strength-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+        .table-section {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            overflow-x: auto;
+            margin-bottom: var(--gap);
+        }
+        .table-section h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .data-table thead th {
+            text-align: left; padding: 10px 12px; border-bottom: 2px solid #dee2e6;
+            color: var(--text-secondary); font-weight: 600; font-size: 11px;
+            text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+            cursor: pointer; user-select: none;
+        }
+        .data-table thead th:hover { color: var(--text-primary); background: #f8f9fa; }
+        .data-table tbody td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; }
+        .data-table tbody tr:hover { background: #f8f9fa; }
+        .badge {
+            display: inline-block; padding: 2px 8px; border-radius: 12px;
+            font-size: 11px; font-weight: 600;
+        }
+        .badge.high { background: #fde8e8; color: #dc3545; }
+        .badge.medium { background: #fff3cd; color: #856404; }
+        .badge.low { background: #d4edda; color: #155724; }
+        .badge.tone-calm { background: #d4edda; color: #155724; }
+        .badge.tone-neutral { background: #e2e3e5; color: #383d41; }
+        .badge.tone-strained { background: #fde8e8; color: #dc3545; }
+        .footer {
+            text-align: center; padding: 16px; font-size: 12px;
+            color: var(--text-secondary); margin-top: 8px;
+        }
+        @media (max-width: 900px) {
+            .chart-row, .chart-row.three-col { grid-template-columns: 1fr; }
+            .kpi-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media print {
+            body { background: white; }
+            .filters { display: none; }
+            .chart-container { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <div>
+            <h1>Veterinary Communication Analysis</h1>
+            <div class="subtitle">2,842 clinical visit transcripts &middot; Feb 2024 &ndash; Jan 2026 &middot; Central Time (Chicago)</div>
+        </div>
+        <div class="filters">
+            <div class="filter-group">
+                <label>Period</label>
+                <select id="filter-period" onchange="applyFilter()">
+                    <option value="all">All Time</option>
+                    <option value="2024-H1">2024 H1</option>
+                    <option value="2024-H2">2024 H2</option>
+                    <option value="2025-H1">2025 H1</option>
+                    <option value="2025-H2">2025 H2</option>
+                    <option value="2026">2026</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <section class="kpi-row" id="kpi-row"></section>
+
+    <div class="section-header">Communication Strengths</div>
+    <section class="strengths-grid" id="strengths-grid"></section>
+
+    <div class="section-header">Patterns &amp; Trends</div>
+    <section class="chart-row full">
+        <div class="chart-container tall">
+            <h3>Monthly Trends: Strain, Empathy &amp; Closing Quality</h3>
+            <canvas id="chart-monthly"></canvas>
+        </div>
+    </section>
+
+    <section class="chart-row">
+        <div class="chart-container">
+            <h3>Average Strain by Time of Day</h3>
+            <canvas id="chart-time"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Average Strain by Day of Week</h3>
+            <canvas id="chart-day"></canvas>
+        </div>
+    </section>
+
+    <section class="chart-row">
+        <div class="chart-container">
+            <h3>Strain Score Distribution</h3>
+            <canvas id="chart-strain-dist"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Emotional Tone Distribution</h3>
+            <canvas id="chart-tone"></canvas>
+        </div>
+    </section>
+
+    <section class="chart-row">
+        <div class="chart-container">
+            <h3>Strain Factor Frequency</h3>
+            <canvas id="chart-factors"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Visit Volume by Hour</h3>
+            <canvas id="chart-hour-vol"></canvas>
+        </div>
+    </section>
+
+    <div class="section-header">High-Strain Visits</div>
+    <section class="table-section">
+        <h3>Top 20 Highest Strain Transcripts</h3>
+        <table class="data-table" id="strain-table">
+            <thead>
+                <tr>
+                    <th>Transcript</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Strain</th>
+                    <th>Empathy</th>
+                    <th>Closing</th>
+                    <th>Tone</th>
+                    <th>Strain Factors</th>
+                </tr>
+            </thead>
+            <tbody id="strain-tbody"></tbody>
+        </table>
+    </section>
+
+    <footer class="footer">
+        Devonshire Veterinary Clinic &middot; Communication Analysis Dashboard &middot; Data as of Jan 2026
+    </footer>
+</div>
+
+<script>
+const COLORS = ['#4C72B0','#DD8452','#55A868','#C44E52','#8172B3','#937860','#17a2b8'];
+
+const DATA = {
+    kpis: {"total":2842,"avg_strain":43.8,"avg_empathy":0.75,"avg_closing":0.26,"avg_question_rate":8.2,"high_strain_pct":36.5,"avg_calm":4.59},
+    by_time: [{"time_bucket":"early_am","count":271,"avg_strain":43.78,"avg_empathy":0.71,"avg_closing":0.3},{"time_bucket":"morning","count":981,"avg_strain":43.48,"avg_empathy":0.74,"avg_closing":0.25},{"time_bucket":"lunch","count":417,"avg_strain":44.09,"avg_empathy":0.8,"avg_closing":0.27},{"time_bucket":"afternoon","count":713,"avg_strain":44.0,"avg_empathy":0.78,"avg_closing":0.26},{"time_bucket":"late_day","count":326,"avg_strain":44.68,"avg_empathy":0.74,"avg_closing":0.22},{"time_bucket":"evening","count":85,"avg_strain":41.35,"avg_empathy":0.79,"avg_closing":0.39},{"time_bucket":"overnight","count":49,"avg_strain":41.73,"avg_empathy":0.68,"avg_closing":0.43}],
+    by_day: [{"day_of_week":"Mon","count":564,"avg_strain":43.54,"avg_empathy":0.7},{"day_of_week":"Tue","count":342,"avg_strain":42.5,"avg_empathy":0.88},{"day_of_week":"Wed","count":407,"avg_strain":45.02,"avg_empathy":0.74},{"day_of_week":"Thu","count":446,"avg_strain":43.98,"avg_empathy":0.72},{"day_of_week":"Fri","count":542,"avg_strain":43.62,"avg_empathy":0.76},{"day_of_week":"Sat","count":396,"avg_strain":44.38,"avg_empathy":0.75},{"day_of_week":"Sun","count":145,"avg_strain":42.41,"avg_empathy":0.85}],
+    by_month: [{"month":"2024-02","count":84,"avg_strain":42.2,"avg_empathy":0.96,"avg_closing":0.16,"avg_question_rate":9.03},{"month":"2024-03","count":64,"avg_strain":43.52,"avg_empathy":0.85,"avg_closing":0.02,"avg_question_rate":9.26},{"month":"2024-04","count":55,"avg_strain":40.45,"avg_empathy":0.93,"avg_closing":0.11,"avg_question_rate":8.37},{"month":"2024-05","count":94,"avg_strain":51.81,"avg_empathy":0.23,"avg_closing":0.05,"avg_question_rate":2.5},{"month":"2024-06","count":79,"avg_strain":48.23,"avg_empathy":0.39,"avg_closing":0.09,"avg_question_rate":4.58},{"month":"2024-07","count":74,"avg_strain":43.78,"avg_empathy":0.54,"avg_closing":0.18,"avg_question_rate":9.45},{"month":"2024-08","count":64,"avg_strain":43.12,"avg_empathy":0.43,"avg_closing":0.21,"avg_question_rate":8.55},{"month":"2024-09","count":66,"avg_strain":45.45,"avg_empathy":0.67,"avg_closing":0.27,"avg_question_rate":8.44},{"month":"2024-10","count":114,"avg_strain":42.28,"avg_empathy":0.63,"avg_closing":0.2,"avg_question_rate":9.24},{"month":"2024-11","count":102,"avg_strain":41.72,"avg_empathy":0.71,"avg_closing":0.26,"avg_question_rate":9.33},{"month":"2024-12","count":140,"avg_strain":41.61,"avg_empathy":0.93,"avg_closing":0.24,"avg_question_rate":9.42},{"month":"2025-01","count":103,"avg_strain":43.83,"avg_empathy":0.67,"avg_closing":0.36,"avg_question_rate":9.81},{"month":"2025-02","count":130,"avg_strain":44.69,"avg_empathy":0.56,"avg_closing":0.16,"avg_question_rate":8.77},{"month":"2025-03","count":121,"avg_strain":42.19,"avg_empathy":0.74,"avg_closing":0.29,"avg_question_rate":9.48},{"month":"2025-04","count":113,"avg_strain":42.43,"avg_empathy":0.57,"avg_closing":0.16,"avg_question_rate":8.69},{"month":"2025-05","count":130,"avg_strain":43.23,"avg_empathy":0.65,"avg_closing":0.32,"avg_question_rate":8.63},{"month":"2025-06","count":137,"avg_strain":44.01,"avg_empathy":0.85,"avg_closing":0.4,"avg_question_rate":8.53},{"month":"2025-07","count":182,"avg_strain":41.65,"avg_empathy":1.09,"avg_closing":0.5,"avg_question_rate":7.67},{"month":"2025-08","count":149,"avg_strain":43.46,"avg_empathy":1.01,"avg_closing":0.28,"avg_question_rate":8.55},{"month":"2025-09","count":167,"avg_strain":43.08,"avg_empathy":0.76,"avg_closing":0.33,"avg_question_rate":7.74},{"month":"2025-10","count":167,"avg_strain":43.08,"avg_empathy":0.84,"avg_closing":0.22,"avg_question_rate":8.01},{"month":"2025-11","count":196,"avg_strain":44.92,"avg_empathy":0.77,"avg_closing":0.4,"avg_question_rate":7.79},{"month":"2025-12","count":168,"avg_strain":47.05,"avg_empathy":0.77,"avg_closing":0.23,"avg_question_rate":6.7},{"month":"2026-01","count":143,"avg_strain":43.57,"avg_empathy":0.9,"avg_closing":0.28,"avg_question_rate":7.89}],
+    tone_dist: {"calm":2275,"neutral":555,"strained":12},
+    strengths: {"Calm Leadership":4.59,"Curiosity":2.03,"Clarity":0.9,"Empathy":0.67,"Confidence":0.55,"Partnership":0.49,"Closing":0.26},
+    strain_dist: {"0-15":26,"15-20":283,"20-25":0,"25-30":4,"30-35":123,"35-40":1370,"40-45":0,"45-50":19,"50-55":857,"55-60":0,"60-65":0,"65-70":150,"70-75":0,"75-80":0,"80-85":10,"85-100":0},
+    factor_counts: {"weak_closing":2754,"low_empathy":2445,"low_curiosity":659,"frustration_markers":451,"terse_responses":222,"high_hedging":29,"none":21},
+    top_strain: [{"filename":"114797-transcript.txt","date":"2025-02-08","time_bucket":"morning","strain_score":85,"strain_factors":"low_empathy, low_curiosity, weak_closing, terse_responses, frustration_markers","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"calm"},{"filename":"255848-transcript.txt","date":"2025-05-23","time_bucket":"morning","strain_score":85,"strain_factors":"low_empathy, low_curiosity, weak_closing, terse_responses, frustration_markers","empathy_score":0.33,"closing_quality_score":0.0,"emotional_tone":"calm"},{"filename":"314848-transcript.txt","date":"2025-06-26","time_bucket":"morning","strain_score":85,"strain_factors":"low_empathy, low_curiosity, weak_closing, terse_responses, frustration_markers","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"neutral"},{"filename":"32325-transcript.txt","date":"2024-10-30","time_bucket":"lunch","strain_score":85,"strain_factors":"low_empathy, low_curiosity, weak_closing, terse_responses, frustration_markers","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"calm"},{"filename":"389693-transcript.txt","date":"2025-08-02","time_bucket":"afternoon","strain_score":85,"strain_factors":"low_empathy, high_hedging, low_curiosity, weak_closing, terse_responses","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"neutral"},{"filename":"65005-transcript.txt","date":"2024-12-13","time_bucket":"morning","strain_score":85,"strain_factors":"low_empathy, high_hedging, low_curiosity, weak_closing, terse_responses","empathy_score":0.61,"closing_quality_score":0.0,"emotional_tone":"calm"},{"filename":"685843-transcript.txt","date":"2025-12-08","time_bucket":"early_am","strain_score":85,"strain_factors":"low_empathy, high_hedging, low_curiosity, weak_closing, terse_responses","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"neutral"},{"filename":"701842-transcript.txt","date":"2025-12-13","time_bucket":"early_am","strain_score":85,"strain_factors":"low_empathy, high_hedging, low_curiosity, weak_closing, terse_responses","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"neutral"},{"filename":"74037-transcript.txt","date":"2024-12-24","time_bucket":"morning","strain_score":85,"strain_factors":"low_empathy, low_curiosity, weak_closing, terse_responses, frustration_markers","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"neutral"},{"filename":"805770-transcript.txt","date":"2026-01-27","time_bucket":"afternoon","strain_score":85,"strain_factors":"low_empathy, low_curiosity, weak_closing, terse_responses, frustration_markers","empathy_score":0.54,"closing_quality_score":0.0,"emotional_tone":"calm"},{"filename":"100967-transcript.txt","date":"2025-01-25","time_bucket":"lunch","strain_score":70,"strain_factors":"low_empathy, low_curiosity, weak_closing, terse_responses","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"neutral"},{"filename":"104668-transcript.txt","date":"2025-01-29","time_bucket":"late_day","strain_score":70,"strain_factors":"low_empathy, low_curiosity, weak_closing, terse_responses","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"strained"},{"filename":"104999-transcript.txt","date":"2025-01-30","time_bucket":"morning","strain_score":70,"strain_factors":"low_empathy, low_curiosity, weak_closing, terse_responses","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"calm"},{"filename":"1095-transcript.txt","date":"2024-03-22","time_bucket":"early_am","strain_score":70,"strain_factors":"low_empathy, low_curiosity, weak_closing, terse_responses","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"calm"},{"filename":"112796-transcript.txt","date":"2025-02-06","time_bucket":"afternoon","strain_score":70,"strain_factors":"low_empathy, low_curiosity, weak_closing, terse_responses","empathy_score":0.33,"closing_quality_score":0.0,"emotional_tone":"calm"},{"filename":"11372-transcript.txt","date":"2024-09-04","time_bucket":"overnight","strain_score":70,"strain_factors":"low_empathy, low_curiosity, weak_closing, terse_responses","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"neutral"},{"filename":"114804-transcript.txt","date":"2025-02-08","time_bucket":"morning","strain_score":70,"strain_factors":"low_empathy, low_curiosity, weak_closing, frustration_markers","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"calm"},{"filename":"115987-transcript.txt","date":"2025-02-10","time_bucket":"afternoon","strain_score":70,"strain_factors":"low_empathy, high_hedging, low_curiosity, weak_closing","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"neutral"},{"filename":"120654-transcript.txt","date":"2025-02-13","time_bucket":"late_day","strain_score":70,"strain_factors":"low_empathy, low_curiosity, weak_closing, frustration_markers","empathy_score":0.48,"closing_quality_score":0.0,"emotional_tone":"calm"},{"filename":"120721-transcript.txt","date":"2025-02-13","time_bucket":"late_day","strain_score":70,"strain_factors":"low_empathy, low_curiosity, weak_closing, terse_responses","empathy_score":0.0,"closing_quality_score":0.0,"emotional_tone":"calm"}],
+    by_hour: [{"hour_of_day":0,"count":9,"avg_strain":40.0},{"hour_of_day":1,"count":7,"avg_strain":50.0},{"hour_of_day":2,"count":4,"avg_strain":50.0},{"hour_of_day":3,"count":6,"avg_strain":33.33},{"hour_of_day":4,"count":4,"avg_strain":42.5},{"hour_of_day":5,"count":5,"avg_strain":41.0},{"hour_of_day":6,"count":4,"avg_strain":43.75},{"hour_of_day":7,"count":35,"avg_strain":40.86},{"hour_of_day":8,"count":232,"avg_strain":44.22},{"hour_of_day":9,"count":289,"avg_strain":44.03},{"hour_of_day":10,"count":343,"avg_strain":42.94},{"hour_of_day":11,"count":349,"avg_strain":43.54},{"hour_of_day":12,"count":254,"avg_strain":44.19},{"hour_of_day":13,"count":163,"avg_strain":43.93},{"hour_of_day":14,"count":255,"avg_strain":43.65},{"hour_of_day":15,"count":262,"avg_strain":44.05},{"hour_of_day":16,"count":196,"avg_strain":44.39},{"hour_of_day":17,"count":185,"avg_strain":44.7},{"hour_of_day":18,"count":141,"avg_strain":44.65},{"hour_of_day":19,"count":40,"avg_strain":40.0},{"hour_of_day":20,"count":20,"avg_strain":43.25},{"hour_of_day":21,"count":12,"avg_strain":39.58},{"hour_of_day":22,"count":13,"avg_strain":44.23},{"hour_of_day":23,"count":14,"avg_strain":40.0}]
+};
+
+const charts = {};
+
+function getFilteredMonths() {
+    const period = document.getElementById('filter-period').value;
+    return DATA.by_month.filter(m => {
+        if (period === 'all') return true;
+        if (period === '2024-H1') return m.month >= '2024-01' && m.month <= '2024-06';
+        if (period === '2024-H2') return m.month >= '2024-07' && m.month <= '2024-12';
+        if (period === '2025-H1') return m.month >= '2025-01' && m.month <= '2025-06';
+        if (period === '2025-H2') return m.month >= '2025-07' && m.month <= '2025-12';
+        if (period === '2026') return m.month >= '2026-01';
+        return true;
+    });
+}
+
+function renderKPIs() {
+    const fm = getFilteredMonths();
+    const totalVisits = fm.reduce((s,m) => s + m.count, 0);
+    const avgStrain = fm.length ? (fm.reduce((s,m) => s + m.avg_strain * m.count, 0) / totalVisits).toFixed(1) : 0;
+    const avgEmpathy = fm.length ? (fm.reduce((s,m) => s + m.avg_empathy * m.count, 0) / totalVisits).toFixed(2) : 0;
+    const avgClosing = fm.length ? (fm.reduce((s,m) => s + m.avg_closing * m.count, 0) / totalVisits).toFixed(2) : 0;
+    const avgQR = fm.length ? (fm.reduce((s,m) => s + m.avg_question_rate * m.count, 0) / totalVisits).toFixed(1) : 0;
+
+    const strainClass = avgStrain >= 50 ? 'high' : avgStrain >= 40 ? 'medium' : 'low';
+
+    document.getElementById('kpi-row').innerHTML = `
+        <div class="kpi-card blue">
+            <div class="kpi-label">Total Visits</div>
+            <div class="kpi-value">${totalVisits.toLocaleString()}</div>
+            <div class="kpi-sub">${fm.length} months</div>
+        </div>
+        <div class="kpi-card ${avgStrain >= 45 ? 'red' : 'orange'}">
+            <div class="kpi-label">Avg Strain Score</div>
+            <div class="kpi-value">${avgStrain}<span style="font-size:14px;color:var(--text-secondary)">/100</span></div>
+            <div class="kpi-sub"><span class="badge ${strainClass}">${strainClass} risk</span></div>
+        </div>
+        <div class="kpi-card green">
+            <div class="kpi-label">Calm Leadership</div>
+            <div class="kpi-value">${DATA.kpis.avg_calm}<span style="font-size:14px;color:var(--text-secondary)">/5</span></div>
+            <div class="kpi-sub">Top strength</div>
+        </div>
+        <div class="kpi-card purple">
+            <div class="kpi-label">Avg Empathy</div>
+            <div class="kpi-value">${avgEmpathy}<span style="font-size:14px;color:var(--text-secondary)">/5</span></div>
+            <div class="kpi-sub">Target: 1.5+</div>
+        </div>
+        <div class="kpi-card orange">
+            <div class="kpi-label">Closing Quality</div>
+            <div class="kpi-value">${avgClosing}<span style="font-size:14px;color:var(--text-secondary)">/5</span></div>
+            <div class="kpi-sub">Priority #1</div>
+        </div>
+        <div class="kpi-card teal">
+            <div class="kpi-label">Question Rate</div>
+            <div class="kpi-value">${avgQR}</div>
+            <div class="kpi-sub">per 100 sentences</div>
+        </div>
+        <div class="kpi-card gold">
+            <div class="kpi-label">High Strain Visits</div>
+            <div class="kpi-value">${DATA.kpis.high_strain_pct}%</div>
+            <div class="kpi-sub">Score &ge; 50</div>
+        </div>
+    `;
+}
+
+function renderStrengths() {
+    const strengthColors = {'Calm Leadership':'#28a745','Curiosity':'#4C72B0','Clarity':'#DD8452','Empathy':'#8172B3','Confidence':'#17a2b8','Partnership':'#937860','Closing':'#dc3545'};
+    const grid = document.getElementById('strengths-grid');
+    grid.innerHTML = Object.entries(DATA.strengths).map(([name, score]) => {
+        const pct = (score / 5 * 100).toFixed(0);
+        const color = strengthColors[name] || '#4C72B0';
+        return `<div class="strength-card">
+            <div class="strength-name">${name}</div>
+            <div class="strength-score" style="color:${color}">${score}</div>
+            <div style="font-size:11px;color:var(--text-secondary)">out of 5.0</div>
+            <div class="strength-bar"><div class="strength-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+        </div>`;
+    }).join('');
+}
+
+function renderMonthlyChart() {
+    const fm = getFilteredMonths();
+    const ctx = document.getElementById('chart-monthly').getContext('2d');
+    if (charts.monthly) charts.monthly.destroy();
+    charts.monthly = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: fm.map(m => m.month),
+            datasets: [
+                { label: 'Avg Strain', data: fm.map(m => m.avg_strain), borderColor: '#C44E52', backgroundColor: '#C44E5220', borderWidth: 2.5, fill: true, tension: 0.3, pointRadius: 3, yAxisID: 'y' },
+                { label: 'Avg Empathy (x10)', data: fm.map(m => (m.avg_empathy * 10).toFixed(1)), borderColor: '#8172B3', borderWidth: 2, tension: 0.3, pointRadius: 3, borderDash: [5,3], yAxisID: 'y' },
+                { label: 'Avg Closing (x10)', data: fm.map(m => (m.avg_closing * 10).toFixed(1)), borderColor: '#DD8452', borderWidth: 2, tension: 0.3, pointRadius: 3, borderDash: [2,2], yAxisID: 'y' },
+                { label: 'Visit Count', data: fm.map(m => m.count), borderColor: '#4C72B080', backgroundColor: '#4C72B015', borderWidth: 1, fill: true, tension: 0.3, pointRadius: 0, yAxisID: 'y1', type: 'bar' }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 16, font: { size: 12 } } } },
+            scales: {
+                x: { grid: { display: false } },
+                y: { beginAtZero: true, max: 60, title: { display: true, text: 'Score' }, grid: { color: '#f0f0f0' } },
+                y1: { beginAtZero: true, position: 'right', title: { display: true, text: 'Visits' }, grid: { display: false } }
+            }
+        }
+    });
+}
+
+function renderTimeChart() {
+    const labels = DATA.by_time.map(t => t.time_bucket.replace('_',' '));
+    const ctx = document.getElementById('chart-time').getContext('2d');
+    if (charts.time) charts.time.destroy();
+    const barColors = DATA.by_time.map(t => t.avg_strain >= 44 ? '#C44E52CC' : t.avg_strain >= 43 ? '#DD8452CC' : '#55A868CC');
+    charts.time = new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: 'Avg Strain', data: DATA.by_time.map(t => t.avg_strain), backgroundColor: barColors, borderRadius: 4 }] },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { afterLabel: (ctx) => `n=${DATA.by_time[ctx.dataIndex].count} visits` } } },
+            scales: { x: { grid: { display: false } }, y: { beginAtZero: false, min: 38, max: 48, grid: { color: '#f0f0f0' } } }
+        }
+    });
+}
+
+function renderDayChart() {
+    const ctx = document.getElementById('chart-day').getContext('2d');
+    if (charts.day) charts.day.destroy();
+    const barColors = DATA.by_day.map(d => d.avg_strain >= 44 ? '#C44E52CC' : d.avg_strain >= 43 ? '#DD8452CC' : '#55A868CC');
+    charts.day = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: DATA.by_day.map(d => d.day_of_week), datasets: [{ label: 'Avg Strain', data: DATA.by_day.map(d => d.avg_strain), backgroundColor: barColors, borderRadius: 4 }] },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { afterLabel: (ctx) => `n=${DATA.by_day[ctx.dataIndex].count} visits` } } },
+            scales: { x: { grid: { display: false } }, y: { beginAtZero: false, min: 38, max: 48, grid: { color: '#f0f0f0' } } }
+        }
+    });
+}
+
+function renderStrainDist() {
+    const entries = Object.entries(DATA.strain_dist).filter(([,v]) => v > 0);
+    const ctx = document.getElementById('chart-strain-dist').getContext('2d');
+    if (charts.strainDist) charts.strainDist.destroy();
+    const colors = entries.map(([k]) => {
+        const lo = parseInt(k.split('-')[0]);
+        if (lo >= 70) return '#dc3545CC';
+        if (lo >= 50) return '#DD8452CC';
+        if (lo >= 35) return '#ffc107CC';
+        return '#55A868CC';
+    });
+    charts.strainDist = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: entries.map(([k]) => k), datasets: [{ label: 'Visits', data: entries.map(([,v]) => v), backgroundColor: colors, borderRadius: 4 }] },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { grid: { display: false }, title: { display: true, text: 'Strain Score Range' } }, y: { beginAtZero: true, grid: { color: '#f0f0f0' }, title: { display: true, text: 'Visit Count' } } }
+        }
+    });
+}
+
+function renderTone() {
+    const ctx = document.getElementById('chart-tone').getContext('2d');
+    if (charts.tone) charts.tone.destroy();
+    charts.tone = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Calm','Neutral','Strained'],
+            datasets: [{ data: [DATA.tone_dist.calm, DATA.tone_dist.neutral, DATA.tone_dist.strained], backgroundColor: ['#55A868CC','#6c757dCC','#C44E52CC'], borderColor: '#fff', borderWidth: 3 }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false, cutout: '55%',
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 16 } },
+                tooltip: { callbacks: { label: (ctx) => { const total = ctx.dataset.data.reduce((a,b) => a+b, 0); return `${ctx.label}: ${ctx.parsed} (${(ctx.parsed/total*100).toFixed(1)}%)`; } } }
+            }
+        }
+    });
+}
+
+function renderFactors() {
+    const entries = Object.entries(DATA.factor_counts).filter(([k]) => k !== 'none');
+    const ctx = document.getElementById('chart-factors').getContext('2d');
+    if (charts.factors) charts.factors.destroy();
+    charts.factors = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: entries.map(([k]) => k.replace(/_/g,' ')), datasets: [{ label: 'Occurrences', data: entries.map(([,v]) => v), backgroundColor: ['#C44E52CC','#DD8452CC','#8172B3CC','#937860CC','#4C72B0CC','#17a2b8CC'], borderRadius: 4 }] },
+        options: {
+            responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, grid: { color: '#f0f0f0' } }, y: { grid: { display: false } } }
+        }
+    });
+}
+
+function renderHourVol() {
+    const ctx = document.getElementById('chart-hour-vol').getContext('2d');
+    if (charts.hourVol) charts.hourVol.destroy();
+    charts.hourVol = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: DATA.by_hour.map(h => h.hour_of_day + ':00'),
+            datasets: [{ label: 'Visits', data: DATA.by_hour.map(h => h.count), backgroundColor: '#4C72B080', borderRadius: 2 }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { afterLabel: (ctx) => `Avg strain: ${DATA.by_hour[ctx.dataIndex].avg_strain}` } } },
+            scales: { x: { grid: { display: false }, title: { display: true, text: 'Hour of Day' } }, y: { beginAtZero: true, grid: { color: '#f0f0f0' }, title: { display: true, text: 'Visits' } } }
+        }
+    });
+}
+
+function renderTable() {
+    const tbody = document.getElementById('strain-tbody');
+    tbody.innerHTML = DATA.top_strain.map(r => {
+        const toneClass = 'tone-' + r.emotional_tone;
+        const strainClass = r.strain_score >= 70 ? 'high' : r.strain_score >= 50 ? 'medium' : 'low';
+        return `<tr>
+            <td style="font-family:monospace;font-size:12px">${r.filename}</td>
+            <td>${r.date}</td>
+            <td>${r.time_bucket.replace('_',' ')}</td>
+            <td><span class="badge ${strainClass}">${r.strain_score}</span></td>
+            <td>${r.empathy_score.toFixed(2)}</td>
+            <td>${r.closing_quality_score.toFixed(2)}</td>
+            <td><span class="badge ${toneClass}">${r.emotional_tone}</span></td>
+            <td style="font-size:11px;max-width:250px">${r.strain_factors}</td>
+        </tr>`;
+    }).join('');
+}
+
+function applyFilter() {
+    renderKPIs();
+    renderMonthlyChart();
+}
+
+// Init
+renderKPIs();
+renderStrengths();
+renderMonthlyChart();
+renderTimeChart();
+renderDayChart();
+renderStrainDist();
+renderTone();
+renderFactors();
+renderHourVol();
+renderTable();
+</script>
+</body>
+</html>
