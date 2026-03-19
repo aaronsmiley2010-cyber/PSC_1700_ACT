@@ -23,6 +23,28 @@
 <script src="andy_analysis_batch17.js"></script>
 <script src="andy_analysis_batch18.js"></script>
 <style>
+#password-gate {
+  display: flex; align-items: center; justify-content: center;
+  position: fixed; inset: 0; background: #ebeff3; z-index: 9999;
+  font-family: system-ui, sans-serif;
+}
+#password-gate form {
+  background: #fff; padding: 2.5rem; border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.12); text-align: center; max-width: 340px; width: 90%;
+}
+#password-gate h2 { margin: 0 0 .25rem; color: #29444f; font-size: 1.25rem; }
+#password-gate p { margin: 0 0 1.25rem; color: #6b7c87; font-size: .875rem; }
+#password-gate input {
+  width: 100%; padding: .6rem .75rem; border: 1px solid #d7dee7; border-radius: 6px;
+  font-size: 1rem; box-sizing: border-box; margin-bottom: .75rem;
+}
+#password-gate button {
+  width: 100%; padding: .6rem; background: #29444f; color: #fff; border: none;
+  border-radius: 6px; font-size: 1rem; cursor: pointer;
+}
+#password-gate button:hover { background: #3d9b8d; }
+#password-gate .error { color: #c0392b; font-size: .8rem; margin-top: .5rem; display: none; }
+#main-content { display: none; }
 :root {
   --page: #ebeff3;
   --paper: #ffffff;
@@ -1100,6 +1122,16 @@ a {
 </style>
 </head>
 <body>
+<div id="password-gate">
+  <form onsubmit="return checkPassword()">
+    <h2>Password Required</h2>
+    <p>Enter the password to view this report.</p>
+    <input type="password" id="pw-input" placeholder="Password" autofocus>
+    <button type="submit">Enter</button>
+    <div class="error" id="pw-error">Incorrect password. Try again.</div>
+  </form>
+</div>
+<div id="main-content">
 <div class="page-ribbon">VetSOAP Findings Report | Exam-room transcript analysis</div>
 
 <div class="shell">
@@ -1741,6 +1773,18 @@ function renderTranscripts() {
 }
 
 renderTranscripts();
+</script>
+</div><!-- end main-content -->
+<script>
+function checkPassword() {
+  if (document.getElementById('pw-input').value === 'vetsoapatc') {
+    document.getElementById('password-gate').style.display = 'none';
+    document.getElementById('main-content').style.display = 'block';
+  } else {
+    document.getElementById('pw-error').style.display = 'block';
+  }
+  return false;
+}
 </script>
 </body>
 </html>
