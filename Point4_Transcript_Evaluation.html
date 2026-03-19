@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VetSOAP — Point 4 Transcript Evaluation Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--brand:#1a5276;--accent:#2e86c1;--green:#27ae60;--yellow:#f39c12;--red:#e74c3c;--bg:#f4f6f9;--card:#fff;--text:#2c3e50;--muted:#7f8c8d;--border:#dce1e6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+header{background:linear-gradient(135deg,var(--brand),var(--accent));color:#fff;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+header h1{font-size:1.5rem;font-weight:700}
+header .sub{opacity:.85;font-size:.88rem}
+.container{max-width:1360px;margin:0 auto;padding:24px}
+/* Summary Cards */
+.summary-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+.summary-card{background:var(--card);border-radius:12px;padding:20px 22px;box-shadow:0 1px 4px rgba(0,0,0,.06);text-align:center}
+.summary-card .value{font-size:2rem;font-weight:700;margin:6px 0 2px}
+.summary-card .label{font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.summary-card.green .value{color:var(--green)}
+.summary-card.yellow .value{color:var(--yellow)}
+.summary-card.red .value{color:var(--red)}
+.summary-card.brand .value{color:var(--accent)}
+/* Section */
+.section{margin-bottom:32px}
+.section h2{font-size:1.18rem;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--border)}
+/* Charts row */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px}
+.chart-card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.chart-card h3{font-size:.95rem;margin-bottom:12px;color:var(--brand)}
+@media(max-width:860px){.charts-row{grid-template-columns:1fr}}
+/* Table */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.82rem;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+th{background:var(--brand);color:#fff;padding:10px 12px;text-align:left;white-space:nowrap;position:sticky;top:0}
+td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:hover td{background:#eaf2f8}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.72rem;font-weight:600;color:#fff}
+.badge.yes{background:var(--green)}.badge.no{background:var(--red)}.badge.partial{background:var(--yellow)}
+.badge.detected{background:var(--red)}.badge.none{background:var(--green)}
+.tooltip-cell{cursor:help;text-decoration:underline dotted var(--muted)}
+/* Filters */
+.filters{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filters label{font-size:.82rem;font-weight:600}
+.filters select{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:.82rem}
+/* Detail cards */
+.detail-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.detail-card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-left:4px solid var(--accent)}
+.detail-card h4{font-size:.95rem;margin-bottom:6px;color:var(--brand)}
+.detail-card .meta{font-size:.78rem;color:var(--muted);margin-bottom:10px}
+.detail-card ul{font-size:.82rem;padding-left:18px}
+.detail-card ul li{margin-bottom:4px}
+.detail-card .atc-score{font-size:1.6rem;font-weight:700;float:right;margin-top:-36px}
+.score-high{color:var(--green)}.score-mid{color:var(--yellow)}.score-low{color:var(--red)}
+footer{text-align:center;padding:24px;font-size:.78rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+<div><h1>VetSOAP — Point 4 Transcript Evaluation</h1><div class="sub">50 Random Transcripts · Meeting Agenda 03.13.2026 · Measurements & ATC Scoring</div></div>
+<div style="text-align:right;font-size:.82rem"><div>Evaluated: March 13, 2026</div><div>Source: Jason Szumski Transcripts (n=50 of 2,842)</div></div>
+</header>
+<div class="container">
+
+<!-- ═══════ SUMMARY ═══════ -->
+<div class="summary-row" id="summaryRow"></div>
+
+<!-- ═══════ CHARTS ═══════ -->
+<div class="charts-row">
+<div class="chart-card"><h3>Communication Barriers — Prevalence</h3><canvas id="chartBarriers"></canvas></div>
+<div class="chart-card"><h3>Approach to Care — Indicator Rates</h3><canvas id="chartApproach"></canvas></div>
+</div>
+<div class="charts-row">
+<div class="chart-card"><h3>ATC Score Distribution (0–100)</h3><canvas id="chartATC"></canvas></div>
+<div class="chart-card"><h3>First Recommendation Acceptance</h3><canvas id="chartAcceptance"></canvas></div>
+</div>
+
+<!-- ═══════ MASTER TABLE ═══════ -->
+<div class="section">
+<h2>Per-Transcript Scoring Matrix</h2>
+<div class="filters">
+<label>Filter by barrier:</label>
+<select id="filterBarrier"><option value="all">All</option><option value="rushed">Rushed</option><option value="jargon">Jargon</option><option value="deferred">Deferred</option><option value="interruption">Client Interruption</option><option value="minimal">Minimal Comm.</option></select>
+<label style="margin-left:12px">Sort:</label>
+<select id="sortField"><option value="id">Transcript ID</option><option value="atc">ATC Score ↑</option><option value="atcDesc">ATC Score ↓</option></select>
+</div>
+<div class="table-wrap"><table id="masterTable"><thead><tr>
+<th>ID</th><th>Pet</th><th>Visit Type</th>
+<th>Rushed</th><th>Jargon</th><th>Deferred</th><th>Client Int.</th><th>Minimal</th>
+<th>Options?</th><th>When?</th><th>Who?</th><th>Decline→Why?</th><th>Decline→Alt?</th><th>Decline→Pay?</th>
+<th>1st Rec Accept</th><th>ATC</th>
+</tr></thead><tbody id="masterBody"></tbody></table></div>
+</div>
+
+<!-- ═══════ DETAIL CARDS ═══════ -->
+<div class="section">
+<h2>Detailed Transcript Evaluations</h2>
+<div class="detail-cards" id="detailCards"></div>
+</div>
+
+</div>
+<footer>VetSOAP × PetSmart Charities Access to Care Data Initiative · Point 4 Evaluation · Generated by Claude</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA — 25 evaluated transcripts
+// ═══════════════════════════════════════════════════════════
+const data = [
+{id:"108559",pet:"Sweetie",species:"Dog",visit:"Emergency — Syncopal events / heart failure",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam and diagnostic explanation",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"X-ray then hospitalization",
+notes:"Exemplary communication. Vet explained syncopal vs seizure in lay terms, presented Option 1 (diagnostics + hospitalization) and Option 2 (euthanasia) with compassion, discussed prognosis realistically, reviewed x-rays together with owner, explained kidney monitoring. Cost estimate promised. No barriers detected. Payment plan not explicitly offered but estimate was provided.",
+atcBarrierDeductions:0,atcPositiveCredits:40},
+
+{id:"120525",pet:"Bambi",species:"Dog",visit:"Rabies vaccine + neuter consult + aggression/anxiety",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam and discussion",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Neuter + training + trazodone",
+notes:"Vet provided multi-faceted plan: neutering to reduce hormonal aggression, training recommendations (daycare, Barrington Square, Dogtopia), behavioral handout, trazodone for interim relief, and discussed Prozac as future option. Offered spectrum of care from behavioral to pharmaceutical. Clear, conversational communication. No payment plan discussed.",
+atcBarrierDeductions:0,atcPositiveCredits:30},
+
+{id:"12169",pet:"Wyla",species:"Cat",visit:"Annual exam / vomiting follow-up",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Continue Fortiflora + steroid + monitor",
+notes:"Good rapport and warm communication. Vet discussed pigmentation concern clearly, explained normal aging changes, addressed herpes flare-up possibility related to stress, discussed antibiotics from prior call that were never picked up. Assessed that body likely cleared the UTI naturally. No cost discussion needed — routine visit.",
+atcBarrierDeductions:0,atcPositiveCredits:20},
+
+{id:"1316",pet:"Mickey",species:"Dog",visit:"Vaccine consult / arthritis / boarding discussion",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After discussion with owner on goals",who:"Vet",declineSeekWhy:true,declineAltOffered:true,declinePayOffered:false},
+firstRecAccepted:false,firstRec:"Full vaccination panel for boarding",
+notes:"Outstanding spectrum of care. Owner asked whether a 14-year-old dog needed full vaccines. Vet acknowledged age concern, didn't push, explained which vaccines were truly needed vs optional. Owner chose only Bordetella + rabies — vet supported this. For arthritis, vet offered gabapentin at two dose levels (pain vs anxiety), mentioned Rimadyl and Librela as additional options. Transparent about cost tiers at different boarding facilities. Gabapentin for separation anxiety also discussed as anti-anxiety trial. No payment plans explicitly offered.",
+atcBarrierDeductions:0,atcPositiveCredits:40},
+
+{id:"13434",pet:"Cooper",species:"Dog",visit:"New patient — puppy wellness / ears / food / training",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam and discussion",who:"Vet + Tech",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Bordetella + ear cleaner + fecal + food guidance",
+notes:"Very thorough new-patient visit. Vet addressed diet (Pro Plan chicken & rice, calculated calories at 850/day), training options (in-person preferred over drop-off, specific local recommendations), ear care protocol, neuter site check, allergy monitoring plan (environmental vs food), and fecal testing rationale. Tech provided good handoff. Positive reinforcement training advocated. Long, unhurried visit.",
+atcBarrierDeductions:0,atcPositiveCredits:30},
+
+{id:"145721",pet:"Abe",species:"Dog",visit:"Sick visit — not eating 3 days, abdominal pain",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"X-ray (stepwise approach offered)",
+notes:"Vet offered stepwise diagnostics: Option A was blood work + x-rays together; Option B was start with x-ray of belly only, and if answer found, skip blood work. This is excellent spectrum of care — allowing owner to manage cost while still getting diagnostics. Explained findings on physical exam clearly (enlarged testicle, perianal hyperplasia, prostate exam). No jargon without explanation.",
+atcBarrierDeductions:0,atcPositiveCredits:40},
+
+{id:"165858",pet:"Jellybean",species:"Cat",visit:"Sick visit — gagging/constipation on atopica",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam and discussion",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Cerenia injection + sub-Q fluids",
+notes:"Vet offered clear plan: anti-nausea injection (Cerenia), sub-Q fluids with Gatorade analogy for electrolytes, and optional x-ray (but was transparent that exam findings were benign). Deferred to regular vet on atopica dosing change — appropriate. Discussed hydrolyzed diet already in place. Waiting on blood work from regular vet before making further decisions. Owner was a vet tech — staff-to-staff communication was efficient and respectful.",
+atcBarrierDeductions:0,atcPositiveCredits:40},
+
+{id:"187364",pet:"Willow & Vinny",species:"Dog",visit:"Routine vaccines — two puppies",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:false,when:"N/A",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Annual vaccines (3 each)",
+notes:"Straightforward dual-puppy wellness visit. Vaccines administered with clear explanation of injection sites and potential sensitivity. Noted Vinny was on doxycycline for tick — acknowledged GI side effects as expected. Both dogs examined, temp checked, Cook County rabies tags provided. Short, efficient, warm. No options to offer since this was strictly a vaccine visit.",
+atcBarrierDeductions:0,atcPositiveCredits:10},
+
+{id:"20571",pet:"Olly",species:"Cat",visit:"Recheck — blood in urine / bladder stone",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Ultrasound + urine sample, then diet trial",
+notes:"Vet explained diagnostic plan clearly: ultrasound to check for bladder stone, urine sample via cystocentesis, possible x-ray if ultrasound inconclusive. When stone was confirmed, offered both dietary dissolution trial (urinary SO diet for 4-8 weeks with recheck at 4 weeks) and mentioned surgical options. Good spectrum of care — conservative approach first. Transcript is truncated but approach is sound.",
+atcBarrierDeductions:0,atcPositiveCredits:40},
+
+{id:"223582",pet:"Nelly",species:"Dog",visit:"Routine vaccines + allergy Rx refill",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After discussion",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"3-year rabies (cost-compared with 1-year)",
+notes:"Vet proactively offered choice between 1-year ($54) and 3-year ($99) rabies — transparent cost comparison. Owner chose 3-year. Apoquel prescription renewed for Costco pickup — acknowledging owner's pharmacy preference for cost savings. Allergy management discussed: use Apoquel as needed when itching returns during pollen season. Miralax dosing relayed for another pet. Good exam, no concerns.",
+atcBarrierDeductions:0,atcPositiveCredits:40},
+
+{id:"23921",pet:"Javi",species:"Dog",visit:"Emergency — grape ingestion / toxicity",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:false,when:"N/A — emergency protocol",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Emesis + monitoring",
+notes:"Emergency visit — grape ingestion in 18.5 lb dog. Vet called poison control, induced vomiting, recovered most grapes. Explained two trains of thought on grape toxicity (dose-dependent vs pesticide-related). Clear discharge instructions: monitor for vomiting, excess drinking/urination, possible loose stool. Poison control report printed for owner. Praised owner for acting quickly. No cost discussion needed — emergency with clear protocol.",
+atcBarrierDeductions:0,atcPositiveCredits:20},
+
+{id:"27483",pet:"Enzo",species:"Dog",visit:"Post-boarding — bloody nose + diarrhea",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Probiotic paste + capsules",
+notes:"Vet examined nose, explained reverse sneezing can rupture vessels, reassured about allergens at kennel. For diarrhea, prescribed probiotic paste (3 days) + capsules (7 days) — described paste as 'pumpkin on steroids' (good lay analogy). Validated owner's use of pumpkin. Warm, reassuring tone with first-time dog owners who compared themselves to new parents. Efficient visit.",
+atcBarrierDeductions:0,atcPositiveCredits:20},
+
+{id:"278166",pet:"Anna",species:"Dog",visit:"End-of-life — kidney failure / euthanasia discussion",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After presenting blood work results",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Sub-Q fluids + schedule euthanasia",
+notes:"Deeply compassionate end-of-life conversation. Vet presented creatinine (4.2→12.9) and BUN (63→120) clearly with context. Explained 75% kidney threshold concept without jargon. Offered multiple euthanasia options: today, later tonight, tomorrow morning, at home via house call service. Gave sub-Q fluids for comfort. Discussed timeline, scheduling, what to expect (30 seconds, hour total visit). Validated owner's grieving process. Addressed acute vs chronic kidney disease question. No financial barriers imposed.",
+atcBarrierDeductions:0,atcPositiveCredits:50},
+
+{id:"312322",pet:"Nacho",species:"Dog",visit:"Recheck — IVDD (intervertebral disc disease) pain management",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam and discussion",who:"Vet",declineSeekWhy:true,declineAltOffered:true,declinePayOffered:true},
+firstRecAccepted:true,firstRec:"Day hospitalization for pain med management",
+notes:"Excellent cost transparency. Vet offered: Option 1 — keep here for ~12 hrs ($100 medical boarding); Option 2 — give meds now, go home. Also explained 24-hr hospitalization with IV ($750-1000) if needed longer. Owner asked about costs directly and vet answered transparently with hourly hospitalization rates. Explained gabapentin every 8 hrs (not 12) for better pain control, Rimadyl injection option for food-refusing dog. Emphasized 6-8 week strict rest. Owner involved in decision. Full financial discussion.",
+atcBarrierDeductions:0,atcPositiveCredits:50},
+
+{id:"3180",pet:"Maple",species:"Dog",visit:"Tooth loss / dental disease assessment",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Schedule dental cleaning + extraction",
+notes:"Vet explained dental disease clearly — bacteria caking on teeth, gingival inflammation, calculus hiding underlying issues. Offered two paths: pull loose incisor under sedation now, or do full dental cleaning (preferred). Discussed post-dental care realistically: 'I've realized daily brushing isn't realistic' — moved to Greenies recommendation. Addressed anesthesia fears from prior bad experience at another clinic. Explained modern reversible anesthesia. Drop-off protocol explained (7-7:30AM, call when awake, pickup early-mid afternoon). Toenail trim added while under.",
+atcBarrierDeductions:0,atcPositiveCredits:30},
+
+{id:"383662",pet:"Cooper/Bentley/Kaden",species:"Dog",visit:"Phone call — hookworm results + deworming plan",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"During call",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Drontal dewormer + consistent Simparica Trio",
+notes:"Phone call delivering fecal results. Vet explained hookworm transmission between dogs clearly, noted Bentley cleared but Cooper and Kaden now positive. Discussed that Simparica Trio also kills hookworms if given consistently — offered long-term prevention strategy alongside acute treatment. Planned recheck fecal in 2 weeks. Efficient, clear phone communication.",
+atcBarrierDeductions:0,atcPositiveCredits:20},
+
+{id:"420398",pet:"Vivian",species:"Dog",visit:"Recheck — worsening infection, possible fungal (blastomycosis)",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After blood work review",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Hospitalization + fungal panel + chest x-rays",
+notes:"Complex case with rapidly deteriorating values over 5 days. Vet walked through CBC, chem panel side-by-side with prior results — explained each marker in lay terms (WBC 8.4→26K, bands indicating true infection, platelets low = bruising risk, kidney and liver values climbing). Transparent about prognosis: 'I wanna be honest with you... this is progressing quickly which scares me.' Explained blastomycosis etiology (sniffing soil), lepto vaccination relevance. Offered visitation policy during hospitalization. Itemized estimate promised.",
+atcBarrierDeductions:0,atcPositiveCredits:40},
+
+{id:"533936",pet:"Ghost",species:"Dog",visit:"Recheck — immune-mediated disease, skin infections",
+barriers:{rushed:false,jargon:true,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam and blood review",who:"Vet",declineSeekWhy:true,declineAltOffered:true,declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Taper prednisone 10/5→5/5, continue antibiotics",
+notes:"Minor jargon: 'first generation cephalosporin' used briefly but then simplified. Owner asked about antibiotic resistance — vet explained clearly. Good discussion of immunosuppressive medication taper plan, skin infection management during taper, warm compress for scabs, fish oil for skin barrier. Transparent about Simparica Trio pricing ($37.78 single, $206.68 six-pack with rebate). Weight-based dosing explained. Monthly recheck schedule maintained. Overall strong communication with one minor jargon moment.",
+atcBarrierDeductions:10,atcPositiveCredits:40},
+
+{id:"560621",pet:"Tank",species:"Dog",visit:"Emergency — pharyngeal mass / airway obstruction",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After diagnostics",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Intubation + overnight oxygen + specialist referral",
+notes:"High-acuity emergency. Vet walked owner through x-ray findings in real-time, explained the gray circular area, hyoid anatomy. When mass was discovered (not a foreign body), discussed: debulking in-house vs specialist surgery (recommended). Arranged transfer to specialist at 4:30AM for morning surgery slot. Explained worst case (airway obstruction) and best case (debulk and remove). Owner wanted to stay overnight — vet accommodated. Steroid injection to reduce swelling. Guarded prognosis discussed with cancer likelihood. Owner stated 'we don't care what it costs' — no financial barrier.",
+atcBarrierDeductions:0,atcPositiveCredits:40},
+
+{id:"667596",pet:"Sammy",species:"Dog",visit:"Phone call — GI panel results / diet recommendation",
+barriers:{rushed:false,jargon:true,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"During call",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Hypoallergenic diet + fiber for 4-5 months",
+notes:"Phone call explaining GI panel. Minor jargon: 'trypsin-like immunoreactivity' used but then explained ('tests for pancreatic enzymes'). Discussed pancreatitis (negative), TLI (normal), B12 dysbiosis. Practical advice: pick up small bag first to test palatability, two approved diets to choose from, script at clinic. Emphasized puppy-specific nutritional needs (minerals for bone development). Recheck in 4 months. Clear, educational phone communication.",
+atcBarrierDeductions:10,atcPositiveCredits:30},
+
+{id:"701996",pet:"Lily",species:"Cat",visit:"Vaccines + eye discharge management",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Distemper vaccine + new eye ointment",
+notes:"Vet addressed eye discharge history, explained distemper vaccine helps protect against upper respiratory causes of discharge. When current ointment wasn't resolving in 24 hours, switched to different antibiotic ointment (resistant infection hypothesis). Set clear timeline: if still discharging in 1 month, reevaluate. Exam thorough — lymph nodes, heart. Also discussed Addison's disease case management with staff (educational moment).",
+atcBarrierDeductions:0,atcPositiveCredits:30},
+
+{id:"702488",pet:"Bella",species:"Dog",visit:"Hospitalized — vestibular disease (vertigo)",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"During visit/update",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:true},
+firstRecAccepted:true,firstRec:"Continue hospitalization + meclizine + Cerenia",
+notes:"Vet explained vestibular disease clearly using 'old dog idiopathic vestibular disease' then simplified. Described nystagmus ('eyes bouncing back and forth'). Discussed medications: meclizine for dizziness, Cerenia for nausea/motion sickness. Offered medical boarding at $80/day as step-down from ICU. Owner expressed financial concern ('I didn't think I could afford your next price') — vet offered lower-cost medical boarding option and sling/mask to facilitate home care. Payment discussion was responsive to owner's stated concern.",
+atcBarrierDeductions:0,atcPositiveCredits:50},
+
+{id:"702614",pet:"Xoco",species:"Cat",visit:"Phone update — post foreign body surgery",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"During call",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Appetite stimulant + owner visit at 2PM with food",
+notes:"Brief phone update on post-surgical cat. Vet explained 24-hour post-surgery eating expectation, plan to start appetite stimulant at lunchtime, invited owner to bring home food at 2PM. Goal: if eating, discharge same day. Clear, concise, warm phone communication.",
+atcBarrierDeductions:0,atcPositiveCredits:10},
+
+{id:"7972",pet:"Murphy",species:"Dog",visit:"Emergency — allergic reaction / facial swelling",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:false,when:"N/A — emergency protocol",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Antihistamine injections + Benadryl at home",
+notes:"Classic allergic reaction emergency. Vet explained differential causes (bug bite, food, vaccine reaction — ruled out last). Treatment plan clear: in-hospital injections for swelling, Benadryl at home (half of 25mg tablet every 8 hours for 13.5 lb dog). Explained monitoring: breathing difficulty = come back, possible flare-up, possible diarrhea. Practical 15-minute observation period before discharge. Efficient emergency visit.",
+atcBarrierDeductions:0,atcPositiveCredits:20},
+
+{id:"815388",pet:"Major",species:"Dog",visit:"Recheck — glaucoma / intraocular pressure management",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After pressure measurement",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Add latanoprost drops + continue CoSopt",
+notes:"Vet explained left eye responding well (normal pressure), right eye pressure climbing. Added third medication (latanoprost) with different mechanism of action. Scheduled Sunday recheck with another doctor who was briefed. Discussed surgical option (enucleation) when owner asked: would remove right eye only, leave comfortable left eye. Offered to consult ophthalmologist for additional ideas. Transparent that 'I've never had to go past these three without taking out the eye.' Honest, collaborative approach.",
+atcBarrierDeductions:0,atcPositiveCredits:40},
+
+// ═══════ BATCH 2 — 25 NEW TRANSCRIPTS ═══════
+
+{id:"131852",pet:"Butterscotch",species:"Cat",visit:"Sick — not eating 2 days, drinking excessively",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:true},
+firstRecAccepted:true,firstRec:"In-house blood work (vs send-out option)",
+notes:"Excellent spectrum of care with explicit cost options. Vet explained two differential diagnoses (CKD vs hyperthyroidism) in lay terms with analogies (dialysis comparison). Offered Option 1: in-house blood work (results in 25-30 min, more expensive) vs Option 2: send-out (results next day, cheaper). Recommended in-house given severity. Heart murmur noted and connected to hyperthyroid possibility. Feliway towel for stress reduction. Owner's cat ornery — vet accommodating. Also discussed dental findings after blood draw. No jargon without explanation.",
+atcBarrierDeductions:0,atcPositiveCredits:40},
+
+{id:"192750",pet:"Billion",species:"Dog",visit:"Second opinion — lip hair loss / irritation",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Apoquel + coconut oil + fish oil supplement",
+notes:"Clear stepwise approach: coconut oil topical (safe if licked), Apoquel to break itch-lick cycle (explained mechanism: 'tells brain you're not itchy'), fish oil for hair regrowth. Examined teeth to rule out dental cause. Explained histamine mechanism without jargon. Tapering course explained (twice daily for 1 week, then once daily for 1 week). Offered OTC supplement recommendation. Checked Simparica Trio status for Demodex rule-out. Weight checked on baby scale for accuracy. Warm, thorough.",
+atcBarrierDeductions:0,atcPositiveCredits:30},
+
+{id:"197895",pet:"Lottie",species:"Dog",visit:"Annual — mobility issues / arthritis in 14-year-old",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam and discussion on goals",who:"Vet",declineSeekWhy:true,declineAltOffered:true,declinePayOffered:true},
+firstRecAccepted:true,firstRec:"NSAID (pending renal panel) + vaccines",
+notes:"Excellent access-to-care. Owner declined heartworm test — vet didn't push but pivoted to recommend renal panel instead (needed before starting NSAID). Explained kidney concern from prior blood work (creatinine/BUN elevated in 2023). Offered in-house (faster, more expensive) vs send-out (cheaper, results next day) — owner chose send-out. Used own 13.5-year-old lab as relatable example. Described lowest effective dose strategy. Demonstrated hip range of motion. UTI history addressed. Personal, unhurried despite being a 14-year-old dog.",
+atcBarrierDeductions:0,atcPositiveCredits:50},
+
+{id:"216866",pet:"Bella Boo",species:"Dog",visit:"Brown vaginal discharge / possible diabetes discovery",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam and urinalysis",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Antibiotics + wipes + blood panel for diabetes",
+notes:"Diagnostic workup pivoted mid-visit when urinalysis revealed sugar — vet explained diabetes connection clearly and pivoted plan. Discussed hooded vulva causing recurrent UTI, offered two long-term solutions (weight loss vs vulvoplasty surgery). Differentiated ovarian remnant from infection. Sent out blood panel with promise to call with results and walk through insulin training if needed. Practical discharge: wipes for skin folds, antibiotics. Stepwise approach from conservative to surgical.",
+atcBarrierDeductions:0,atcPositiveCredits:40},
+
+{id:"278772",pet:"Mudslide",species:"Dog",visit:"Wellness — cyst, dental, weight, training consult",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam and discussion",who:"Vet + Tech",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:true},
+firstRecAccepted:true,firstRec:"Blood work + vaccines + weight management plan",
+notes:"Tech reduced cost by ~$200 before vet entered room — excellent spectrum of care at front desk. 'Some blood work is better than no blood work' philosophy. Vet addressed: cyst (drain vs monitor), dental tartar (treats vs ultrasonic cleaning with honest 'lasts about a year' caveat), tip fracture (explained no pulp exposure), weight (73→60-65 lb target, 800-1000 cal/day calculated, calorie sheet provided), incontinence in daughter's dog (urine sample recommended). Also addressed Barkley's seizure question via phone. Thorough, multi-pet consultation.",
+atcBarrierDeductions:0,atcPositiveCredits:50},
+
+{id:"291602",pet:"Puck",species:"Dog",visit:"New patient — leg mass / ursodiol refill",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After FNA results",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:true},
+firstRecAccepted:true,firstRec:"Topical steroid/antibiotic cream (vs surgical excision)",
+notes:"Vet performed FNA in-house, reported results immediately (no mast cells — benign). Discussed surgical excision challenge (poor skin closure at that location) and offered conservative topical therapy first. Transparent about expectations ('probably not to nothing, but a decent amount of shrinkage'). Ursodiol refill handled via online pharmacy with price-matching (Chewy/Amazon). Twice daily application with practical advice: apply before dinner to distract from licking. Written instructions provided.",
+atcBarrierDeductions:0,atcPositiveCredits:40},
+
+{id:"305642",pet:"She",species:"Dog",visit:"Surgical dictation — foreign body enterotomy",
+barriers:{rushed:false,jargon:true,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:false,when:"N/A — surgical dictation",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"N/A — surgical procedure note",
+notes:"This is a surgical dictation recording, not a client-facing conversation. Heavy medical terminology throughout (dorsal recumbency, ciliotomy, enterotomy, PDS suture, mesentery, peristalsis). Appropriate for medical record but not evaluable for client communication barriers or approach to care. Included for completeness.",
+atcBarrierDeductions:0,atcPositiveCredits:0},
+
+{id:"3701",pet:"Toffee",species:"Dog",visit:"Recheck — steroid taper for mass / wellness vaccines",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After discussion on clinical history",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Taper prednisone to quarter tab BID + blood work",
+notes:"Complex steroid management case. Vet engaged deeply with owner's detailed medication history, validated owner's observations about evening episodes. Explained dose-response relationship at different ranges. Acknowledged muscle wasting from steroids. Offered to increase food to compensate for weight loss. Blood work sent out with next-day callback plan. Addressed eye discharge (seasonal allergies, Benadryl helping). Bordetella oral vaccine given with kennel cough explanation. Cook County rabies tag provided. Long, patient conversation.",
+atcBarrierDeductions:0,atcPositiveCredits:30},
+
+{id:"47619",pet:"Gracie",species:"Cat",visit:"Sick — URI / herpes virus / sneezing",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:true},
+firstRecAccepted:true,firstRec:"Antibiotic injection + lysine supplement",
+notes:"Vet explained herpes virus lifecycle clearly: latent infection, stress triggers, 7-day self-clearing, when antibiotics are/aren't needed. Decision to treat with antibiotic injection based on fever finding. Lysine supplement recommended with Amazon option noted as cheaper than in-clinic. Discussed need for FVRCP booster (got one as kitten, needs second). Connected brother's visit yesterday for context. Transparent about when antibiotics help vs don't ('if not yellow discharge, antibiotics are questionable').",
+atcBarrierDeductions:0,atcPositiveCredits:40},
+
+{id:"483190",pet:"Sosa",species:"Dog",visit:"Recheck — chronic pain / spinal / adding amantadine",
+barriers:{rushed:false,jargon:true,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam and discussion",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Add amantadine for chronic wind-up pain",
+notes:"Minor jargon: 'mechanistically similar to ketamine' briefly used but then clarified ('they don't become zombies'). Excellent pain management approach — introduced amantadine for chronic wind-up pain, explained 2-week onset, discussed potential to eventually reduce gabapentin and Rimadyl. Compared Rimadyl (liver monitoring needed) vs gabapentin (very safe long-term). Owner involved in titration plan: if going well, slowly back off other meds. Lumps examined — no intramuscular masses palpated. Spinal pain etiology explained with sciatica analogy.",
+atcBarrierDeductions:10,atcPositiveCredits:40},
+
+{id:"491107",pet:"Linus",species:"Dog",visit:"Senior annual — sebaceous adenoma / heart murmur",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:true},
+firstRecAccepted:true,firstRec:"Rabies vaccine + heartworm test + nail trim",
+notes:"Warm rapport with anxious owner. Sebaceous adenoma identified and explained ('old dog wart') — could remove during future anesthesia. Discussed continuity of care concern openly (owner had seen 5 different vets) — vet encouraged picking a favorite for consistency, acknowledged yearly stuff is fine with anyone. Online pharmacy with price matching offered for Heartgard. Muzzle used respectfully. Owner mentioned back history — vet connected prior Metacam success. Nail trim accommodated. Results promised by email within 1-2 days.",
+atcBarrierDeductions:0,atcPositiveCredits:30},
+
+{id:"501501",pet:"Taki/Bella",species:"Dog",visit:"Phone call — blood work results / dental scheduling",
+barriers:{rushed:false,jargon:true,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:false,when:"N/A — results delivery",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Schedule dental cleaning",
+notes:"Brief voicemail delivering blood work results. Minor jargon: 'inflammatory leukogram' used but then explained ('probably related to Bella's teeth with all the inflammation going on in the gums'). Results unremarkable — cleared for dental. Direct, efficient phone communication.",
+atcBarrierDeductions:10,atcPositiveCredits:10},
+
+{id:"507958",pet:"Pearl",species:"Cat",visit:"Sick — 21-year-old cat / weight loss / kidney disease",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After blood work results",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Kidney diet + appetite stimulant + B12 + antibiotic injection",
+notes:"Outstanding end-of-life care conversation. Vet was upfront: 'if kidney values were 13-14, I'd say it's not fair' but at current levels, comfortable trying therapy. Addressed quality of life question directly when owners asked 'are we being selfish?' — 'I'm pretty upfront about that. If I felt like it, I would let you know.' Broad approach: antibiotic injection (2 weeks), B12 injection, kidney diet (3 Hill's options to try), appetite stimulant (ear ointment — explained absorption, warned to wear gloves). Arthritis deferred to after kidney stabilization. Monthly recheck with same vet requested. Compared diabetes management (which owners had done) to kidney disease ('much easier'). Compassionate, honest, thorough.",
+atcBarrierDeductions:0,atcPositiveCredits:50},
+
+{id:"518435",pet:"Stella",species:"Cat",visit:"Hospitalized — foreign body / scope vs surgery decision",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After imaging review",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:true},
+firstRecAccepted:true,firstRec:"Scope first, flip to surgery if unsuccessful",
+notes:"Exceptional shared decision-making. Vet presented scope vs surgery with full transparency on pros/cons/costs. Scope: less invasive, cheaper, faster recovery, but might miss secondary object. Surgery: definitive but more invasive. Offered hybrid approach: try scope 10 min, flip to surgery if needed ('I normally wash the cost and just charge for surgery'). Explained pylorus obstruction with anatomical detail. Discussed intestinal plication risk. Acknowledged cat's surgical history may complicate. Multiple calls with family members (son and parent) — repeated information patiently. Praised owner's care: 'you've played this exactly how I would have with my cat regardless of money.' Financial discussion transparent ($100 difference for anesthesia time).",
+atcBarrierDeductions:0,atcPositiveCredits:50},
+
+{id:"542106",pet:"Donnie",species:"Dog",visit:"Annual — vaccines / weight management / reactive dog",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet + Tech",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"3-year rabies + ProHeart + Provecta + weight plan",
+notes:"Reactive Rottweiler managed collaboratively between vet and tech. Tech developed treat-based system, positive reinforcement approach noted from prior visit. Vet addressed weight gain (120→132 lb) with calorie calculator (1,200 cal/day target). Connected reduced walks (twins born) to weight gain empathetically. 3-year rabies chosen to minimize future visits. ProHeart injection for heartworm (less pokes = better for reactive dog). Blood work deferred to next year based on age. Practical, supportive visit.",
+atcBarrierDeductions:0,atcPositiveCredits:20},
+
+{id:"56770",pet:"Binky",species:"Cat",visit:"Skin rash / bacterial infection + rabies vaccine",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After microscopy results",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Topical cream + area shave + rabies vaccine",
+notes:"Vet performed skin scrape and microscopy in-house, reported results within 5 minutes (bacterial infection). Explained shaving area for better cream absorption — reassured hair regrowth in ~1 month. Simple treatment: topical cream once daily for 7 days with follow-up if not resolved. Rabies vaccine administered (Cook County requirement noted). Rescue cat with anxiety — vet handled gently. Tech handoff was clean with good history.",
+atcBarrierDeductions:0,atcPositiveCredits:20},
+
+{id:"603257",pet:"Fiona",species:"Dog",visit:"Routine wellness — 3-year rabies + tooth monitoring",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"3-year rabies + monitor chipped tooth",
+notes:"Brief, efficient wellness visit. Vet identified chip fracture on molar — explained no pulp exposure (not painful since eating normally). Offered monitoring vs X-ray under anesthesia if signs develop. 40x blood panel and lepto vaccine scheduled. Bordetella and flu due in 2 weeks. Warm, quick visit with no concerns.",
+atcBarrierDeductions:0,atcPositiveCredits:10},
+
+{id:"6685",pet:"Blitzen",species:"Cat",visit:"Sick — decreased urination / weight loss workup",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam and discussion",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"In-house CBC/chem + urinalysis",
+notes:"Owner is a nurse — vet adapted communication accordingly ('we can use medical jargon'). Acknowledged sister cat's colon cancer history empathetically. Explained 10% body weight loss significance with lay comparison ('like me losing 20 lbs'). Systematically ruled out kidney disease (not drinking excessively), IBD (not vomiting frequently), and obstruction (bladder small on palpation). Compared current labs to 2-year-old baseline. Discussed MiraLAX management, Greenies limits (2/day for dental health with calorie awareness). Owner had Tuesday appointment with Dr. Hazy — vet coordinated care. Thorough, methodical workup.",
+atcBarrierDeductions:0,atcPositiveCredits:40},
+
+{id:"686999",pet:"Samson",species:"Cat",visit:"Hospitalization — kidney disease / UTI / declining",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After lab results",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"IV hospitalization + IV antibiotics + fluids",
+notes:"Complex case — 4th hospitalization since summer. Vet walked through CBC changes side by side (WBC doubled from 18K to 37K, neutrophils indicating infection). UTI identified as likely cause of rapid decline. Explained pyelonephritis mechanism. Realistic about prognosis: 'I can clear the infection, but then the question becomes where are our kidneys at.' Owner emotional but vet validated: 'you're taking excellent care of him, more than most people would.' Addressed owner's guilt about not catching sooner. Practical hospitalization: ICU placement for close monitoring, IV antibiotics for faster kidney delivery, fluid management adjusted for prior sub-Q at home. Owner's medications brought from home. Coordinated with prior treating vet.",
+atcBarrierDeductions:0,atcPositiveCredits:50},
+
+{id:"717511",pet:"Lucy/Patty",species:"Dog",visit:"Recheck — giardia / bloody diarrhea",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After review of history",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:true},
+firstRecAccepted:true,firstRec:"Liquid metronidazole + fiber powder + stew diet + fluids",
+notes:"Vet switched from pills (owner struggling) to liquid formulation — practical spectrum of care. Saved owner money by deferring X-ray: 'my gut is telling me let's not waste your money on that right now.' Addressed zoonotic risk (giardia contagious to humans — bleach surfaces). Switched from paste to fiber powder (owner reported dog hating paste). Changed prescription diet from pate to stew (owner noted dog liked Campbell's soup). Timeline set: 3 days for improvement, finish meds by Christmas Eve. Addressed upcoming puppy-sitting concern directly. Validated scared owner whose previous dog died similarly. Open 24/7 reminder given.",
+atcBarrierDeductions:0,atcPositiveCredits:50},
+
+{id:"737",pet:"Merlin",species:"Cat",visit:"Annual — licking rear / anal gland check",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Neosporin/Animax on scab area + vaccines",
+notes:"Thorough exam: teeth (mild calculus, no gingivitis), ears, eyes, lymph nodes, abdomen, kidneys. Rectal exam performed to check anal glands (normal). Identified one mildly enlarged gland — expressed it. Recommended Animax over Neosporin for secondary infection prevention. Blood work from June still current. Prescription food refill (Blue Buffalo HF for allergies) handled. Owner mentioned cat allergic to treats — vet immediately noted treats shouldn't have been offered. Efficient, warm visit.",
+atcBarrierDeductions:0,atcPositiveCredits:20},
+
+{id:"80608",pet:"Toby",species:"Dog",visit:"Annual vaccines — fearful/reactive dog management",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"During planning",who:"Vet + Tech",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"3-year rabies + distemper + Simparica Trio",
+notes:"Fear-free visit management. Pre-visit trazodone + gabapentin at home. Vet offered two vaccine delivery options: owner holds head in room vs treatment area. Tried room first — succeeded with heavy treat distraction. 3-year rabies chosen to minimize future visits. Fecal sent out. Positive reinforcement throughout. Nail trim attempted after vaccines. Collaborative tech-vet approach with reactive dog. Brief but effective.",
+atcBarrierDeductions:0,atcPositiveCredits:10},
+
+{id:"814214",pet:"Zelda",species:"Dog",visit:"Phone call — mast cell tumor pathology results",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"During call",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Biannual rechecks + monitoring",
+notes:"Delivered mast cell tumor diagnosis with appropriate context: 90% controlled by surgical excision (already done), 10% metastasize. Subcutaneous type explained. Recommended biannual exams (every 6 months). Additional testing pending (1-6 days). Reassuring but realistic: 'I feel pretty confident we won't have to worry again, but these things can do as they please.' Stitches removal scheduled. Clear, concise phone delivery.",
+atcBarrierDeductions:0,atcPositiveCredits:20},
+
+{id:"9109",pet:"Grimm",species:"Dog",visit:"Ear infection + paw licking / allergies",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"Claro ear medication + paw wipes",
+notes:"Stepwise allergy management. Ear: Claro (lasts 2 weeks, no home treatment needed — '9 out of 10 times it works'). Paws: baby wipes or medicated wipes after outdoor time (least invasive first), then Cytopoint injection or Apoquel if needed. Explained itch-lick-bacteria cycle clearly. Owner mentioned other dog with same symptoms — vet connected to seasonal allergies and offered same approach. Ear swab performed in-room. Large dog (Great Dane) managed with treat distraction. Warm, practical.",
+atcBarrierDeductions:0,atcPositiveCredits:30},
+
+{id:"9639",pet:"Minnie",species:"Dog",visit:"Recheck — vaccine site reaction / pain management",
+barriers:{rushed:false,jargon:false,deferred:false,clientInt:false,minimal:false},
+approach:{optionsOffered:true,when:"After exam",who:"Vet",declineSeekWhy:"N/A",declineAltOffered:"N/A",declinePayOffered:false},
+firstRecAccepted:true,firstRec:"NSAID (Rimadyl) + continue gabapentin + Benadryl + sucralfate",
+notes:"Thorough pain workup for vaccine reaction. Vet explained steroid masking effect (reaction appeared after steroid wore off at 72 hours). Offered multimodal pain plan: NSAID for inflammation, gabapentin for nerve pain, Benadryl for histamine at injection site, sucralfate to protect stomach during NSAID/steroid transition. Range of motion tested — good but tense. Connected prior neck bite scar to current nerve sensitivity. Massage encouraged. Ice recommended, heat discouraged during active inflammation. Owner knowledgeable (asked about massage, ice/heat, Zyrtec switching). Recheck in 5 days if not improving, 2 weeks if improving. Detailed, patient communication.",
+atcBarrierDeductions:0,atcPositiveCredits:30},
+];
+
+// ═══════ Compute ATC scores ═══════
+data.forEach(d=>{
+  d.atcScore = Math.max(0, Math.min(100, (50 - d.atcBarrierDeductions) + d.atcPositiveCredits));
+});
+
+// ═══════ SUMMARY CARDS ═══════
+const avgATC = (data.reduce((s,d)=>s+d.atcScore,0)/data.length).toFixed(1);
+const barriersDetected = data.filter(d=>d.barriers.rushed||d.barriers.jargon||d.barriers.deferred||d.barriers.clientInt||d.barriers.minimal).length;
+const optionsRate = ((data.filter(d=>d.approach.optionsOffered).length/data.length)*100).toFixed(0);
+const acceptRate = ((data.filter(d=>d.firstRecAccepted).length/data.length)*100).toFixed(0);
+const payDiscussed = data.filter(d=>d.approach.declinePayOffered===true).length;
+
+document.getElementById('summaryRow').innerHTML = `
+<div class="summary-card brand"><div class="value">${avgATC}</div><div class="label">Mean ATC Score</div></div>
+<div class="summary-card ${barriersDetected<=3?'green':'yellow'}"><div class="value">${barriersDetected}/25</div><div class="label">Transcripts w/ Barriers</div></div>
+<div class="summary-card green"><div class="value">${optionsRate}%</div><div class="label">Options Offered</div></div>
+<div class="summary-card green"><div class="value">${acceptRate}%</div><div class="label">1st Rec Accepted</div></div>
+<div class="summary-card ${payDiscussed>=5?'green':'yellow'}"><div class="value">${payDiscussed}/25</div><div class="label">Payment Discussed</div></div>`;
+
+// ═══════ CHARTS ═══════
+const barrierLabels=['Rushed','Technical Jargon','Deferred to Staff','Client Interruption','Minimal Comm.'];
+const barrierCounts=[
+  data.filter(d=>d.barriers.rushed).length,
+  data.filter(d=>d.barriers.jargon).length,
+  data.filter(d=>d.barriers.deferred).length,
+  data.filter(d=>d.barriers.clientInt).length,
+  data.filter(d=>d.barriers.minimal).length
+];
+new Chart(document.getElementById('chartBarriers'),{type:'bar',data:{labels:barrierLabels,datasets:[{label:'# Transcripts',data:barrierCounts,backgroundColor:['#e74c3c','#f39c12','#8e44ad','#3498db','#e67e22']}]},options:{indexAxis:'y',scales:{x:{beginAtZero:true,max:25,ticks:{stepSize:5}}},plugins:{legend:{display:false}}}});
+
+const approachLabels=['Options Offered','Cost Discussed','Alt Options on Decline','Sought Why on Decline','Payment Plan Offered'];
+const approachCounts=[
+  data.filter(d=>d.approach.optionsOffered).length,
+  data.filter(d=>d.notes.toLowerCase().includes('cost')||d.notes.toLowerCase().includes('price')||d.notes.toLowerCase().includes('$')).length,
+  data.filter(d=>d.approach.declineAltOffered===true).length,
+  data.filter(d=>d.approach.declineSeekWhy===true).length,
+  data.filter(d=>d.approach.declinePayOffered===true).length
+];
+new Chart(document.getElementById('chartApproach'),{type:'bar',data:{labels:approachLabels,datasets:[{label:'# Transcripts',data:approachCounts,backgroundColor:['#27ae60','#2e86c1','#8e44ad','#f39c12','#e74c3c']}]},options:{indexAxis:'y',scales:{x:{beginAtZero:true,max:25,ticks:{stepSize:5}}},plugins:{legend:{display:false}}}});
+
+// ATC distribution
+const atcBuckets=[0,0,0,0,0]; // 0-20,21-40,41-60,61-80,81-100
+data.forEach(d=>{const s=d.atcScore;if(s<=20)atcBuckets[0]++;else if(s<=40)atcBuckets[1]++;else if(s<=60)atcBuckets[2]++;else if(s<=80)atcBuckets[3]++;else atcBuckets[4]++});
+new Chart(document.getElementById('chartATC'),{type:'bar',data:{labels:['0–20','21–40','41–60','61–80','81–100'],datasets:[{label:'# Transcripts',data:atcBuckets,backgroundColor:['#e74c3c','#f39c12','#f1c40f','#2ecc71','#27ae60']}]},options:{scales:{y:{beginAtZero:true,ticks:{stepSize:2}}},plugins:{legend:{display:false}}}});
+
+// Acceptance
+const accYes=data.filter(d=>d.firstRecAccepted).length;
+new Chart(document.getElementById('chartAcceptance'),{type:'doughnut',data:{labels:['Accepted','Declined/Modified'],datasets:[{data:[accYes,data.length-accYes],backgroundColor:['#27ae60','#e74c3c']}]},options:{plugins:{legend:{position:'bottom'}}}});
+
+// ═══════ MASTER TABLE ═══════
+function badge(val,type){
+  if(type==='barrier') return val?'<span class="badge detected">Yes</span>':'<span class="badge none">No</span>';
+  if(type==='yes') return val?'<span class="badge yes">Yes</span>': (val===false?'<span class="badge no">No</span>':'<span class="badge partial">N/A</span>');
+  return val;
+}
+function scoreClass(s){return s>=80?'score-high':s>=50?'score-mid':'score-low'}
+
+function renderTable(arr){
+  const tbody=document.getElementById('masterBody');
+  tbody.innerHTML=arr.map(d=>`<tr>
+    <td>${d.id}</td><td>${d.pet}</td><td style="max-width:180px">${d.visit}</td>
+    <td>${badge(d.barriers.rushed,'barrier')}</td><td>${badge(d.barriers.jargon,'barrier')}</td>
+    <td>${badge(d.barriers.deferred,'barrier')}</td><td>${badge(d.barriers.clientInt,'barrier')}</td>
+    <td>${badge(d.barriers.minimal,'barrier')}</td>
+    <td>${badge(d.approach.optionsOffered,'yes')}</td>
+    <td style="max-width:140px;font-size:.78rem">${d.approach.when||'—'}</td>
+    <td>${d.approach.who}</td>
+    <td>${badge(d.approach.declineSeekWhy==='N/A'?null:d.approach.declineSeekWhy,'yes')}</td>
+    <td>${badge(d.approach.declineAltOffered==='N/A'?null:d.approach.declineAltOffered,'yes')}</td>
+    <td>${badge(d.approach.declinePayOffered==='N/A'?null:d.approach.declinePayOffered,'yes')}</td>
+    <td>${d.firstRecAccepted?'<span class="badge yes">Yes</span>':'<span class="badge no">No</span>'}</td>
+    <td class="${scoreClass(d.atcScore)}" style="font-weight:700">${d.atcScore}</td>
+  </tr>`).join('');
+}
+renderTable(data);
+
+// Filters
+document.getElementById('filterBarrier').addEventListener('change',e=>{
+  const v=e.target.value;
+  let filtered=data;
+  if(v==='rushed') filtered=data.filter(d=>d.barriers.rushed);
+  else if(v==='jargon') filtered=data.filter(d=>d.barriers.jargon);
+  else if(v==='deferred') filtered=data.filter(d=>d.barriers.deferred);
+  else if(v==='interruption') filtered=data.filter(d=>d.barriers.clientInt);
+  else if(v==='minimal') filtered=data.filter(d=>d.barriers.minimal);
+  renderTable(filtered);
+});
+document.getElementById('sortField').addEventListener('change',e=>{
+  const v=e.target.value;
+  let sorted=[...data];
+  if(v==='atc') sorted.sort((a,b)=>a.atcScore-b.atcScore);
+  else if(v==='atcDesc') sorted.sort((a,b)=>b.atcScore-a.atcScore);
+  else sorted.sort((a,b)=>parseInt(a.id)-parseInt(b.id));
+  renderTable(sorted);
+});
+
+// ═══════ DETAIL CARDS ═══════
+document.getElementById('detailCards').innerHTML=data.map(d=>{
+  const barriers=[];
+  if(d.barriers.rushed) barriers.push('Rushed/Rapid');
+  if(d.barriers.jargon) barriers.push('Technical Jargon');
+  if(d.barriers.deferred) barriers.push('Deferred to Staff');
+  if(d.barriers.clientInt) barriers.push('Client Interruption');
+  if(d.barriers.minimal) barriers.push('Minimal Communication');
+  const barrierStr=barriers.length?barriers.join(', '):'None detected';
+
+  return `<div class="detail-card">
+    <div class="atc-score ${scoreClass(d.atcScore)}">${d.atcScore}</div>
+    <h4>${d.id} — ${d.pet} (${d.species})</h4>
+    <div class="meta">${d.visit}</div>
+    <ul>
+      <li><strong>Barriers:</strong> ${barrierStr}</li>
+      <li><strong>Options offered:</strong> ${d.approach.optionsOffered?'Yes — '+d.approach.when:'No / Not applicable'}</li>
+      <li><strong>Info delivered by:</strong> ${d.approach.who}</li>
+      <li><strong>1st recommendation:</strong> ${d.firstRec} — <em>${d.firstRecAccepted?'Accepted':'Declined/Modified'}</em></li>
+      ${d.approach.declinePayOffered===true?'<li><strong>Payment/cost discussed:</strong> Yes</li>':''}
+    </ul>
+    <p style="font-size:.8rem;margin-top:8px;color:#555">${d.notes}</p>
+  </div>`;
+}).join('');
+</script>
+</body>
+</html>

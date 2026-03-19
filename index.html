@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam-Room Findings on Cost-of-Care Conversations</title>
+<script src="andy_analysis_data.js"></script>
+<script src="andy_analysis_batch2.js"></script>
+<script src="andy_analysis_batch3.js"></script>
+<script src="andy_analysis_batch4.js"></script>
+<script src="andy_analysis_batch5.js"></script>
+<script src="andy_analysis_batch6.js"></script>
+<script src="andy_analysis_batch7.js"></script>
+<script src="andy_analysis_batch8.js"></script>
+<script src="andy_analysis_batch9.js"></script>
+<script src="andy_analysis_batch10.js"></script>
+<script src="andy_analysis_batch11.js"></script>
+<script src="andy_analysis_batch12.js"></script>
+<script src="andy_analysis_batch13.js"></script>
+<script src="andy_analysis_batch14.js"></script>
+<script src="andy_analysis_batch15.js"></script>
+<script src="andy_analysis_batch16.js"></script>
+<script src="andy_analysis_batch17.js"></script>
+<script src="andy_analysis_batch18.js"></script>
+<style>
+:root {
+  --page: #ebeff3;
+  --paper: #ffffff;
+  --ink: #29444f;
+  --muted: #6b7c87;
+  --line: #d7dee7;
+  --blue: #29444f;
+  --blue-2: #3d9b8d;
+  --blue-3: #78c4b7;
+  --blue-4: #dff3ee;
+  --red: #dd6f4a;
+  --red-soft: #fff3ee;
+  --gold: #dbb653;
+  --shadow: 0 18px 42px rgba(28, 42, 64, 0.08);
+  --radius: 28px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #f3f5f8 0%, var(--page) 100%);
+  color: var(--ink);
+  font-family: "Aptos", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.55;
+}
+
+a {
+  color: inherit;
+}
+
+.page-ribbon {
+  max-width: 1180px;
+  margin: 18px auto 0;
+  padding: 0 20px;
+  color: #7c8898;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+.shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 20px 36px;
+}
+
+.cover {
+  position: relative;
+  min-height: 620px;
+  margin-top: 16px;
+  border-radius: 34px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.18), transparent 18%),
+    radial-gradient(circle at 82% 18%, rgba(255, 255, 255, 0.12), transparent 15%),
+    linear-gradient(140deg, #243b46 0%, #2c4c57 42%, #3d9b8d 100%);
+  box-shadow: 0 28px 60px rgba(34, 49, 83, 0.16);
+}
+
+.cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0)),
+    radial-gradient(circle at 68% 36%, rgba(255, 255, 255, 0.14), transparent 18%),
+    radial-gradient(circle at 74% 58%, rgba(219, 182, 83, 0.12), transparent 20%),
+    radial-gradient(circle at 79% 22%, rgba(221, 111, 74, 0.12), transparent 12%);
+}
+
+.cover-topline {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 28px 32px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.84rem;
+  letter-spacing: 0.02em;
+}
+
+.cover-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-weight: 700;
+}
+
+.cover-wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  font-family: "Arial Narrow", "Aptos Narrow", "Helvetica Neue Condensed", "Franklin Gothic Medium", sans-serif;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.cover-wordmark .vet {
+  color: #d7edf1;
+}
+
+.cover-wordmark .soap {
+  color: #84e0d2;
+}
+
+.brand-bubbles {
+  position: relative;
+  width: 48px;
+  height: 34px;
+  display: inline-block;
+}
+
+.brand-bubbles span {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.brand-bubbles .bubble-coral {
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  border: 6px solid var(--red);
+}
+
+.brand-bubbles .bubble-slate {
+  bottom: 0;
+  left: 10px;
+  width: 18px;
+  height: 18px;
+  border: 6px solid var(--blue);
+}
+
+.brand-bubbles .bubble-gold {
+  right: 4px;
+  bottom: 2px;
+  width: 15px;
+  height: 15px;
+  border: 5px solid var(--gold);
+}
+
+.brand-bubbles .bubble-outline {
+  top: 5px;
+  right: 0;
+  width: 11px;
+  height: 11px;
+  border: 4px solid #d7edf1;
+}
+
+.cover-chip {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: rgba(221, 111, 74, 0.2);
+  color: #fff;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cover-panel {
+  position: absolute;
+  left: 0;
+  right: 23%;
+  bottom: 0;
+  z-index: 1;
+  padding: 44px 38px 40px;
+  background: rgba(255, 255, 255, 0.98);
+  clip-path: polygon(0 0, 78% 0, 100% 22%, 100% 100%, 0 100%);
+}
+
+.cover-title {
+  margin: 0;
+  color: var(--blue);
+  font-family: "Arial Narrow", "Aptos Narrow", "Helvetica Neue Condensed", "Franklin Gothic Medium", sans-serif;
+  font-size: clamp(2.6rem, 5vw, 4.8rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  max-width: 10ch;
+}
+
+.cover-subtitle {
+  margin: 18px 0 0;
+  max-width: 40rem;
+  color: #37475c;
+  font-size: 1.15rem;
+}
+
+.cover-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.cover-stat {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: #f4f6f9;
+  border: 1px solid #e1e7ee;
+}
+
+.cover-stat .label {
+  display: block;
+  color: #7a8695;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cover-stat strong {
+  display: block;
+  margin-top: 6px;
+  color: #1d2f44;
+  font-size: 1.25rem;
+}
+
+.cover-chevron {
+  position: absolute;
+  right: 56px;
+  bottom: 74px;
+  display: flex;
+  gap: 18px;
+  z-index: 1;
+}
+
+.cover-chevron span {
+  width: 44px;
+  height: 44px;
+  border-top: 11px solid rgba(255, 255, 255, 0.42);
+  border-right: 11px solid rgba(255, 255, 255, 0.42);
+  transform: rotate(45deg);
+}
+
+.toc {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 28px;
+  margin-top: 24px;
+  padding: 34px 36px;
+  background: var(--paper);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.toc h2,
+.section-title,
+.finding-title,
+.chart-title,
+.callout-big,
+.appendix-title {
+  font-family: "Arial Narrow", "Aptos Narrow", "Helvetica Neue Condensed", "Franklin Gothic Medium", sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.toc h2 {
+  margin: 0 0 10px;
+  color: var(--red);
+  font-size: 2.1rem;
+  text-transform: uppercase;
+}
+
+.toc p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.toc-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 20px;
+}
+
+.toc-link {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #edf1f5;
+  text-decoration: none;
+}
+
+.toc-link:hover .toc-copy {
+  text-decoration: underline;
+}
+
+.toc-link strong {
+  color: #16293c;
+  font-size: 1.2rem;
+}
+
+.toc-copy {
+  color: #4f6074;
+}
+
+.page {
+  margin-top: 24px;
+  padding: 34px 36px 40px;
+  background: var(--paper);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.page.blue-page {
+  background: linear-gradient(135deg, #29444f 0%, #345965 46%, #3d9b8d 100%);
+  color: #fff;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.section-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: var(--red);
+  position: relative;
+}
+
+.section-icon::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.9;
+}
+
+.blue-page .section-icon {
+  background: var(--gold);
+}
+
+.blue-page .section-icon::before {
+  background: #fff;
+}
+
+.section-title {
+  margin: 0;
+  color: var(--red);
+  font-size: 2.25rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.blue-page .section-title {
+  color: #fff;
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.95fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.lede {
+  font-size: 1.06rem;
+  color: #33465d;
+}
+
+.lede strong {
+  color: #172739;
+}
+
+.meta-box {
+  padding: 22px 22px 18px;
+  border: 1px solid #e1e7ee;
+  border-radius: 22px;
+  background: #f8fafc;
+}
+
+.meta-box h3,
+.subsection-title,
+.browser-title,
+.toc-copy strong {
+  margin: 0 0 12px;
+  color: #182a3d;
+  font-size: 1rem;
+}
+
+.meta-list {
+  display: grid;
+  gap: 12px;
+}
+
+.meta-item {
+  display: grid;
+  grid-template-columns: 124px 1fr;
+  gap: 10px;
+  font-size: 0.95rem;
+}
+
+.meta-label {
+  color: #7a8797;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.summary-card {
+  padding: 18px 18px 16px;
+  border: 1px solid #e1e7ee;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.summary-card .value {
+  color: #172a3d;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.summary-card .value.red {
+  color: var(--red);
+}
+
+.summary-card .value.blue {
+  color: var(--blue-2);
+}
+
+.summary-card .value.gold {
+  color: #c97912;
+}
+
+.summary-card .label {
+  margin-top: 8px;
+  color: #516173;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.summary-card p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.questions {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid #ebeff4;
+}
+
+.evidence-shift {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid #ebeff4;
+}
+
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.evidence-card {
+  padding: 22px 20px 18px;
+  border-radius: 20px;
+  border: 1px solid #dfe6ee;
+  background: #fbfcfe;
+}
+
+.evidence-card.survey {
+  background: #fff6f1;
+  border-color: #f1ddd4;
+}
+
+.evidence-card.transcript {
+  background: #f2fbf8;
+  border-color: #d1e9e2;
+}
+
+.evidence-kicker {
+  color: #7a8797;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.evidence-card h4 {
+  margin: 10px 0 0;
+  color: #18293d;
+  font-size: 1.08rem;
+}
+
+.evidence-list {
+  margin: 14px 0 0;
+  padding-left: 18px;
+  color: #4e6075;
+}
+
+.evidence-list li + li {
+  margin-top: 8px;
+}
+
+.evidence-banner {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #eef6f9 0%, #f4fbf8 100%);
+  border: 1px solid #dce8ef;
+  color: #30485c;
+  font-size: 0.98rem;
+}
+
+.question-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 24px;
+  margin-top: 14px;
+}
+
+.question {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  align-items: start;
+  color: #394b61;
+}
+
+.question-number {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--blue-4);
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.key-findings {
+  display: grid;
+  gap: 24px;
+}
+
+.finding {
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.finding:first-of-type {
+  padding-top: 0;
+  border-top: none;
+}
+
+.finding-title {
+  margin: 0 0 8px;
+  font-size: 1.85rem;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.finding p {
+  margin: 0;
+  max-width: 78ch;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.finding strong {
+  color: #fff;
+}
+
+.chart-block {
+  margin-top: 28px;
+}
+
+.chart-kicker {
+  color: var(--red);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chart-title {
+  margin: 6px 0 8px;
+  color: #16283b;
+  font-size: 2rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.chart-desc {
+  margin: 0 0 18px;
+  color: var(--muted);
+}
+
+.chart {
+  display: grid;
+  gap: 14px;
+}
+
+.chart-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 270px) 1fr 82px;
+  gap: 14px;
+  align-items: center;
+}
+
+.chart-label {
+  color: #243548;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.chart-track {
+  position: relative;
+  height: 18px;
+  border-radius: 999px;
+  background: #edf2f8;
+  overflow: hidden;
+}
+
+.chart-track::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to right, rgba(36, 53, 72, 0.05) 1px, transparent 1px);
+  background-size: 20% 100%;
+}
+
+.chart-fill {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--blue);
+}
+
+.chart-fill.blue-mid {
+  background: var(--blue-2);
+}
+
+.chart-fill.blue-soft {
+  background: var(--blue-3);
+}
+
+.chart-fill.red {
+  background: var(--red);
+}
+
+.chart-fill.gold {
+  background: #d28d23;
+}
+
+.chart-value {
+  text-align: right;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.callout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 28px;
+  align-items: center;
+  margin-top: 34px;
+  padding: 28px 0 10px;
+  border-top: 1px solid #ebeff4;
+}
+
+.callout-big {
+  margin: 0;
+  color: #17283c;
+  font-size: clamp(2.3rem, 4.3vw, 3.9rem);
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+
+.callout-big .accent {
+  color: var(--red);
+}
+
+.callout p {
+  margin: 0;
+  color: #485a70;
+  font-size: 1.02rem;
+}
+
+.examples {
+  margin-top: 34px;
+  padding-top: 28px;
+  border-top: 1px solid #ebeff4;
+}
+
+.example-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.example-card {
+  padding: 20px 20px 18px;
+  border: 1px solid #dfe6ee;
+  border-radius: 20px;
+  background: #fbfcfe;
+}
+
+.example-id {
+  color: var(--red);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.example-card h3 {
+  margin: 8px 0 4px;
+  font-size: 1.08rem;
+}
+
+.example-visit {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.example-takeaway {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--blue-4);
+  color: #28415e;
+  font-size: 0.95rem;
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #edf7f4;
+  color: #40665d;
+  font-size: 0.75rem;
+}
+
+.example-links,
+.footer-links,
+.transcript-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.text-link {
+  color: var(--blue-2);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}
+
+.implication-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.implication-card {
+  padding: 22px 20px 18px;
+  border-radius: 20px;
+  background: #f8fafc;
+  border: 1px solid #dfe6ee;
+}
+
+.implication-card h3 {
+  margin: 0 0 10px;
+  color: #18293d;
+  font-size: 1.02rem;
+}
+
+.implication-card p {
+  margin: 0;
+  color: #4e6075;
+}
+
+.browser-title {
+  color: #182a3d;
+}
+
+.browser-controls {
+  display: grid;
+  grid-template-columns: 1.15fr auto;
+  gap: 16px;
+  margin-top: 18px;
+  align-items: center;
+}
+
+.control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filter-button,
+.sort-select,
+.search-input {
+  border: 1px solid #d7dee7;
+  border-radius: 12px;
+  background: #fff;
+  color: #223549;
+  font: inherit;
+}
+
+.filter-button {
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.filter-button.active {
+  border-color: var(--blue-2);
+  background: var(--blue-2);
+  color: #fff;
+}
+
+.sort-select,
+.search-input {
+  padding: 10px 12px;
+}
+
+.search-wrap {
+  display: flex;
+  gap: 10px;
+}
+
+.search-input {
+  min-width: 290px;
+}
+
+.results-meta {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.transcript-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.transcript-card {
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid #dce4ed;
+  background: #fbfcfe;
+}
+
+.transcript-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+}
+
+.transcript-id {
+  color: var(--red);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.transcript-card h3 {
+  margin: 8px 0 4px;
+  font-size: 1.05rem;
+}
+
+.transcript-visit {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.accept-pill {
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.accept-pill.yes {
+  background: #e9f7f4;
+  color: var(--blue-2);
+}
+
+.accept-pill.no {
+  background: #fff0ee;
+  color: var(--red);
+}
+
+.takeaway {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--blue-4);
+  color: #28415e;
+  font-size: 0.94rem;
+}
+
+.notes-wrap {
+  margin-top: 14px;
+  border-top: 1px solid #e5ebf2;
+  padding-top: 12px;
+}
+
+.notes-wrap summary {
+  cursor: pointer;
+  color: #31465e;
+  font-weight: 700;
+  list-style: none;
+}
+
+.notes-wrap summary::-webkit-details-marker {
+  display: none;
+}
+
+.notes-wrap summary::after {
+  content: "Show notes";
+}
+
+.notes-wrap[open] summary::after {
+  content: "Hide notes";
+}
+
+.notes {
+  margin-top: 10px;
+  color: #516275;
+  font-size: 0.9rem;
+}
+
+.transcript-links {
+  margin-top: 14px;
+}
+
+.footer {
+  margin-top: 26px;
+  padding: 24px 0 8px;
+  color: #738090;
+  font-size: 0.88rem;
+}
+
+.footer p {
+  margin: 0 0 10px;
+}
+
+@media (max-width: 1080px) {
+  .cover-panel {
+    right: 10%;
+  }
+
+  .overview-grid,
+  .toc,
+  .callout,
+  .browser-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-grid,
+  .implication-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .example-grid,
+  .evidence-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .toc-links {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .page-ribbon,
+  .shell {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .cover {
+    min-height: 560px;
+  }
+
+  .cover-topline {
+    padding: 20px 20px 0;
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .cover-panel {
+    right: 0;
+    padding: 28px 22px 26px;
+    clip-path: none;
+  }
+
+  .cover-meta,
+  .summary-grid,
+  .implication-grid,
+  .question-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page,
+  .toc {
+    padding: 24px 20px 28px;
+    border-radius: 22px;
+  }
+
+  .section-title,
+  .toc h2,
+  .chart-title,
+  .finding-title {
+    font-size: 1.8rem;
+  }
+
+  .chart-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .search-wrap {
+    flex-direction: column;
+  }
+
+  .search-input {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .transcript-top {
+    flex-direction: column;
+  }
+
+  .cover-chevron {
+    display: none;
+  }
+}
+</style>
+</head>
+<body>
+<div class="page-ribbon">VetSOAP Findings Report | Exam-room transcript analysis</div>
+
+<div class="shell">
+  <header class="cover" id="cover">
+    <div class="cover-topline">
+      <div class="cover-brand">
+        <span class="cover-wordmark" aria-label="VetSOAP">
+          <span class="vet">Vet</span><span class="soap">SOAP</span>
+        </span>
+        <span class="brand-bubbles" aria-hidden="true">
+          <span class="bubble-coral"></span>
+          <span class="bubble-slate"></span>
+          <span class="bubble-gold"></span>
+          <span class="bubble-outline"></span>
+        </span>
+      </div>
+      <div class="cover-chip">Observed exam-room data</div>
+    </div>
+    <div class="cover-panel">
+      <h1 class="cover-title">What the Exam Room Shows</h1>
+      <p class="cover-subtitle" id="coverSubtitle"></p>
+      <div class="cover-meta" id="coverMeta"></div>
+    </div>
+    <div class="cover-chevron" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Table of contents">
+    <div>
+      <h2>Table of Contents</h2>
+      <p>
+        A publication-style view of the combined transcript review, organized around what was said in the exam room and what patterns emerged across the sample.
+      </p>
+    </div>
+    <div class="toc-links">
+      <a class="toc-link" href="#overview">
+        <strong>1</strong>
+        <div class="toc-copy">Overview and method</div>
+      </a>
+      <a class="toc-link" href="#key-findings">
+        <strong>2</strong>
+        <div class="toc-copy">Key findings</div>
+      </a>
+      <a class="toc-link" href="#detailed-findings">
+        <strong>3</strong>
+        <div class="toc-copy">Detailed findings and charts</div>
+      </a>
+      <a class="toc-link" href="#implications">
+        <strong>4</strong>
+        <div class="toc-copy">What the findings suggest</div>
+      </a>
+      <a class="toc-link" href="#appendix">
+        <strong>5</strong>
+        <div class="toc-copy">Appendix and transcript browser</div>
+      </a>
+      <a class="toc-link" href="#sources">
+        <strong>6</strong>
+        <div class="toc-copy">Sources and memo links</div>
+      </a>
+    </div>
+  </nav>
+
+  <section class="page" id="overview">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true"></span>
+      <h2 class="section-title">Overview</h2>
+    </div>
+
+    <div class="overview-grid">
+      <div>
+        <p class="lede" id="overviewLede"></p>
+        <p class="lede" id="overviewLedeTwo"></p>
+      </div>
+      <aside class="meta-box">
+        <h3>Method at a glance</h3>
+        <div class="meta-list">
+          <div class="meta-item">
+            <div class="meta-label">Source</div>
+            <div>Point 4 source sample plus additional non-overlapping AI-coded transcript batches</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Unit</div>
+            <div>Observed exam-room conversations, AI-coded at transcript level using a fixed rubric rather than recalled later in a survey</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Codes</div>
+            <div>Options offered, money language, decline inquiry, staged care, risk explanation, minimum responsible care</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Caveat</div>
+            <div id="sampleNote"></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="summary-grid" id="summaryGrid"></div>
+
+    <div class="questions">
+      <h3 class="subsection-title">Questions this transcript evidence can answer directly</h3>
+      <div class="question-grid" id="questionGrid"></div>
+    </div>
+
+    <div class="evidence-shift">
+      <h3 class="subsection-title">Why this evidence is different</h3>
+      <div class="evidence-grid" id="evidenceGrid"></div>
+      <div class="evidence-banner" id="evidenceBanner"></div>
+    </div>
+  </section>
+
+  <section class="page blue-page" id="key-findings">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true"></span>
+      <h2 class="section-title">Key Findings</h2>
+    </div>
+    <div class="key-findings" id="keyFindings"></div>
+  </section>
+
+  <section class="page" id="detailed-findings">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true"></span>
+      <h2 class="section-title">Detailed Findings</h2>
+    </div>
+
+    <article class="chart-block">
+      <div class="chart-kicker">Chart 1</div>
+      <h3 class="chart-title">Signals tied to the central care question</h3>
+      <p class="chart-desc">
+        These counts show whether the transcripts look more like withheld affordable options or like context-sensitive, staged recommendation patterns.
+      </p>
+      <div class="chart" id="primaryChart"></div>
+    </article>
+
+    <div class="callout">
+      <h3 class="callout-big" id="calloutBig"></h3>
+      <p id="calloutBody"></p>
+    </div>
+
+    <article class="chart-block">
+      <div class="chart-kicker">Chart 2</div>
+      <h3 class="chart-title">What affordable care looked like in practice</h3>
+      <p class="chart-desc">
+        When cost-sensitive care appeared, it usually took the form of staging, logistics changes, or explicit risk framing.
+      </p>
+      <div class="chart" id="careChart"></div>
+    </article>
+
+    <section class="examples">
+      <h3 class="subsection-title">Illustrative transcripts</h3>
+      <p class="chart-desc">
+        These representative cases show the kinds of tradeoffs and communication moves that appeared in the sample.
+      </p>
+      <div class="example-grid" id="exampleGrid"></div>
+    </section>
+  </section>
+
+  <section class="page" id="implications">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true"></span>
+      <h2 class="section-title">Implications</h2>
+    </div>
+    <div class="implication-grid" id="implicationGrid"></div>
+  </section>
+
+  <section class="page" id="appendix">
+    <div class="section-head">
+      <span class="section-icon" aria-hidden="true"></span>
+      <h2 class="section-title appendix-title">Appendix: Transcript Browser</h2>
+    </div>
+
+    <h3 class="browser-title">Browse the AI-coded transcript set</h3>
+    <p class="chart-desc">
+      Filter the appendix by the transcript-level signals that matter most to the combined findings across the reviewed sample.
+    </p>
+
+    <div class="browser-controls">
+      <div class="control-row" id="filterButtons"></div>
+      <div class="search-wrap">
+        <select class="sort-select" id="sortSelect" aria-label="Sort transcripts">
+          <option value="representative">Representative first</option>
+          <option value="cost">Cost language first</option>
+          <option value="id">Transcript ID</option>
+        </select>
+        <input class="search-input" id="searchInput" type="search" placeholder="Search pet, visit, note, or transcript ID" aria-label="Search transcripts">
+      </div>
+    </div>
+
+    <div class="results-meta" id="resultsMeta"></div>
+    <div class="transcript-grid" id="transcriptGrid"></div>
+  </section>
+
+  <footer class="footer" id="sources">
+    <p>This shareable web version includes the VetSOAP AI-coded transcript review of the 1700 analyzed cases. Raw transcript files are not included in this public bundle.</p>
+    <div class="footer-links">
+      <a class="text-link" id="baseMemoLink" href="#">Open findings memo</a>
+      <a class="text-link" id="sourceLink" href="#">Open Point 4 source</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+const analysis = window.ANDY_ANALYSIS;
+const batch2 = window.ANDY_ANALYSIS_BATCH2 || null;
+const batch3 = window.ANDY_ANALYSIS_BATCH3 || null;
+const batch4 = window.ANDY_ANALYSIS_BATCH4 || null;
+const batch5 = window.ANDY_ANALYSIS_BATCH5 || null;
+const batch6 = window.ANDY_ANALYSIS_BATCH6 || null;
+const batch7 = window.ANDY_ANALYSIS_BATCH7 || null;
+const batch8 = window.ANDY_ANALYSIS_BATCH8 || null;
+const batch9 = window.ANDY_ANALYSIS_BATCH9 || null;
+const batch10 = window.ANDY_ANALYSIS_BATCH10 || null;
+const batch11 = window.ANDY_ANALYSIS_BATCH11 || null;
+const batch12 = window.ANDY_ANALYSIS_BATCH12 || null;
+const batch13 = window.ANDY_ANALYSIS_BATCH13 || null;
+const batch14 = window.ANDY_ANALYSIS_BATCH14 || null;
+const batch15 = window.ANDY_ANALYSIS_BATCH15 || null;
+const batch16 = window.ANDY_ANALYSIS_BATCH16 || null;
+const batch17 = window.ANDY_ANALYSIS_BATCH17 || null;
+const batch18 = window.ANDY_ANALYSIS_BATCH18 || null;
+
+if (!analysis) {
+  document.body.innerHTML = '<p style="padding:24px;font-family:sans-serif">Could not load <code>andy_analysis_data.js</code>.</p>';
+  throw new Error('andy_analysis_data.js did not load');
+}
+
+const FILTERS = [
+  { key: 'all', label: 'All transcripts' },
+  { key: 'representative', label: 'Representative' },
+  { key: 'explicitMoneyLanguage', label: 'Cost language' },
+  { key: 'explicitDeclineInquiry', label: 'Asked why' },
+  { key: 'payRelatedOption', label: 'Pay or lower-cost logistics' },
+  { key: 'riskExplained', label: 'Risk explained' },
+  { key: 'minimumResponsible', label: 'Minimum responsible' },
+  { key: 'noOptionButAppropriate', label: 'No option needed' },
+  { key: 'barrierDetected', label: 'Barrier detected' }
+];
+
+const state = {
+  filter: 'all',
+  search: '',
+  sort: 'representative'
+};
+
+function percent(value, total) {
+  return Math.round((value / total) * 100);
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function ratio(value, total) {
+  return `${value}/${total}`;
+}
+
+function countOf(value, total) {
+  return `${value.toLocaleString()} of ${total.toLocaleString()}`;
+}
+
+function displayPercent(value, total) {
+  const raw = (value / total) * 100;
+  if (raw > 0 && raw < 1) {
+    return `${raw.toFixed(1)}%`;
+  }
+  return `${Math.round(raw)}%`;
+}
+
+const BADGE_CONFIG = [
+  { key: 'representative', label: 'Representative' },
+  { key: 'explicitMoneyLanguage', label: 'Cost Language' },
+  { key: 'explicitDeclineInquiry', label: 'Asked Why' },
+  { key: 'payRelatedOption', label: 'Pay or Lower-Cost Logistics' },
+  { key: 'stagedTradeoff', label: 'Staged Tradeoff' },
+  { key: 'riskExplained', label: 'Risk Explained' },
+  { key: 'minimumResponsible', label: 'Minimum Responsible Care' },
+  { key: 'noOptionButAppropriate', label: 'No Option Needed' },
+  { key: 'barrierDetected', label: 'Barrier Detected' }
+];
+
+function getBadges(item) {
+  if (Array.isArray(item.badges) && item.badges.length) return item.badges;
+  return BADGE_CONFIG
+    .filter((badge) => item.tags?.[badge.key])
+    .map((badge) => badge.label);
+}
+
+function computeMetrics(transcripts) {
+  return {
+    total: transcripts.length,
+    optionsOffered: transcripts.filter((item) => item.tags.optionsOffered).length,
+    moneyLanguage: transcripts.filter((item) => item.tags.explicitMoneyLanguage).length,
+    explicitDeclineInquiry: transcripts.filter((item) => item.tags.explicitDeclineInquiry).length,
+    payRelatedOption: transcripts.filter((item) => item.tags.payRelatedOption).length,
+    firstRecommendationAccepted: transcripts.filter((item) => item.firstRecommendationAccepted).length,
+    noOptionButAppropriate: transcripts.filter((item) => item.tags.noOptionButAppropriate).length,
+    stagedTradeoff: transcripts.filter((item) => item.tags.stagedTradeoff).length,
+    riskExplained: transcripts.filter((item) => item.tags.riskExplained).length,
+    minimumResponsible: transcripts.filter((item) => item.tags.minimumResponsible).length,
+    pharmacySavings: transcripts.filter((item) => item.tags.pharmacySavings).length,
+    barrierDetected: transcripts.filter((item) => item.tags.barrierDetected).length
+  };
+}
+
+function representativeScore(item) {
+  return Number(item.tags.representative) * 5
+    + Number(item.tags.explicitMoneyLanguage) * 3
+    + Number(item.tags.explicitDeclineInquiry) * 2
+    + Number(item.tags.riskExplained);
+}
+
+const handCodedBatches = [analysis, batch2, batch3, batch4, batch5, batch6, batch7, batch8, batch9, batch10, batch11, batch12, batch13, batch14, batch15, batch16, batch17, batch18].filter((item) => Array.isArray(item?.transcripts));
+const handCodedTranscripts = handCodedBatches.flatMap((item) => item.transcripts);
+const handCodedMemoPath = [...handCodedBatches]
+  .reverse()
+  .find((item) => item?.meta?.memoPath)?.meta.memoPath || analysis.meta.memoPath;
+const handCodedMetrics = computeMetrics(handCodedTranscripts);
+const total = handCodedMetrics.total;
+const optionsPercent = percent(handCodedMetrics.optionsOffered, total);
+const moneyPercent = percent(handCodedMetrics.moneyLanguage, total);
+const inquiryPercent = percent(handCodedMetrics.explicitDeclineInquiry, total);
+const stagedPercent = percent(handCodedMetrics.stagedTradeoff, total);
+
+document.getElementById('coverSubtitle').textContent =
+  `Across ${total} processed exam-room transcripts, options and staged tradeoffs were common, explicit cost language was less common, and budget-first questioning was rare.`;
+
+document.getElementById('coverMeta').innerHTML = [
+  { label: 'Processed sample', value: `${total} reviewed` },
+  { label: 'Evidence type', value: 'Observed conversations' },
+  { label: 'Options offered', value: ratio(handCodedMetrics.optionsOffered, total) },
+  { label: 'Cost explicit', value: ratio(handCodedMetrics.moneyLanguage, total) }
+].map((item) => `
+  <div class="cover-stat">
+    <span class="label">${item.label}</span>
+    <strong>${item.value}</strong>
+  </div>
+`).join('');
+
+document.getElementById('overviewLede').innerHTML =
+  `<strong>This interface is organized as a VetSOAP findings report built only from the AI-coded transcript set.</strong> The analysis reads the exam room directly by applying a fixed coding rubric to ${total} actual transcripts for cost language, alternatives, staged care, decline inquiry, and minimum responsible care patterns.`;
+
+document.getElementById('overviewLedeTwo').innerHTML =
+  `That matters because many access-to-care questions are usually argued from perception, memory, or professional intuition. This dataset tests those questions against observed exam-room behavior: what was said, when it was said, and how the plan changed.`;
+
+document.getElementById('sampleNote').textContent =
+  `This report includes the original Point 4 50-case sample, a second non-overlapping 50-case seeded batch, and ${Math.max(handCodedBatches.length - 2, 0)} additional non-overlapping 100-case AI-coded batches, for a combined ${total}-transcript AI-coded sample. This layer is not yet independently human-validated.`;
+
+document.getElementById('baseMemoLink').href = encodeURI(handCodedMemoPath);
+document.getElementById('baseMemoLink').textContent = `Open ${total}-case findings memo`;
+document.getElementById('sourceLink').href = encodeURI(analysis.meta.sourcePage);
+
+const summaryCards = [
+  {
+    value: displayPercent(handCodedMetrics.optionsOffered, total),
+    label: 'Options offered',
+    note: `${countOf(handCodedMetrics.optionsOffered, total)} transcripts included alternatives or a clear option set.`,
+    tone: 'blue'
+  },
+  {
+    value: displayPercent(handCodedMetrics.moneyLanguage, total),
+    label: 'Explicit money language',
+    note: `${countOf(handCodedMetrics.moneyLanguage, total)} transcripts made affordability verbal and visible in the room.`,
+    tone: 'red'
+  },
+  {
+    value: displayPercent(handCodedMetrics.explicitDeclineInquiry, total),
+    label: 'Asked why first',
+    note: `${countOf(handCodedMetrics.explicitDeclineInquiry, total)} transcripts explicitly explored the reason for hesitation before pivoting.`,
+    tone: 'gold'
+  },
+  {
+    value: displayPercent(handCodedMetrics.stagedTradeoff, total),
+    label: 'Staged tradeoff',
+    note: `${countOf(handCodedMetrics.stagedTradeoff, total)} transcripts showed cost-sensitive care through staging, not withholding.`,
+    tone: 'blue'
+  }
+];
+
+document.getElementById('summaryGrid').innerHTML = summaryCards.map((item) => `
+  <article class="summary-card">
+    <div class="value ${item.tone}">${item.value}</div>
+    <div class="label">${item.label}</div>
+    <p>${item.note}</p>
+  </article>
+`).join('');
+
+document.getElementById('questionGrid').innerHTML = analysis.questions.map((question, index) => `
+  <div class="question">
+    <div class="question-number">${index + 1}</div>
+    <div>${escapeHtml(question)}</div>
+  </div>
+`).join('');
+
+const evidenceCards = [
+  {
+    tone: 'survey',
+    kicker: 'Surveys and perception studies',
+    title: 'Useful for showing what people believe happened',
+    bullets: [
+      'They can reveal perception gaps, disagreement, and how each side remembers the conversation.',
+      'They cannot reliably show who raised cost first, when options were offered, or how the recommendation changed in sequence.'
+    ]
+  },
+  {
+    tone: 'transcript',
+    kicker: 'VetSOAP transcript analysis',
+    title: 'Useful for showing what actually happened in the room',
+    bullets: [
+      'It can test whether cost was named, who introduced it, whether alternatives were offered, and how risk or uncertainty was explained.',
+      'It can locate the exact communication moment where the plan narrowed, adapted, or failed to surface goals and limits.'
+    ]
+  }
+];
+
+document.getElementById('evidenceGrid').innerHTML = evidenceCards.map((item) => `
+  <article class="evidence-card ${item.tone}">
+    <div class="evidence-kicker">${item.kicker}</div>
+    <h4>${item.title}</h4>
+    <ul class="evidence-list">
+      ${item.bullets.map((bullet) => `<li>${bullet}</li>`).join('')}
+    </ul>
+  </article>
+`).join('');
+
+document.getElementById('evidenceBanner').innerHTML =
+  `<strong>Survey evidence shows the perception gap.</strong> VetSOAP transcript analysis shows the mechanism: what was said, in what order, and how the care plan adapted across ${total} AI-coded transcripts.`;
+
+const keyFindings = [
+  {
+    title: 'Options and alternatives were common.',
+    body: `Options or alternatives appeared in <strong>${ratio(handCodedMetrics.optionsOffered, total)}</strong> transcripts. The <strong>${ratio(handCodedMetrics.noOptionButAppropriate, total)}</strong> with no meaningful options were mostly routine wellness, follow-up, or note-style cases where an option set was not really the issue.`
+  },
+  {
+    title: 'Care adaptation was more visible than cost talk.',
+    body: `Only <strong>${ratio(handCodedMetrics.moneyLanguage, total)}</strong> transcripts used clear money-related language, while <strong>${ratio(handCodedMetrics.payRelatedOption, total)}</strong> included pay or lower-cost logistics moves. That suggests affordability may shape plans even when the room does not openly name budget.`
+  },
+  {
+    title: 'The main communication gap was values elicitation.',
+    body: `Only <strong>${ratio(handCodedMetrics.explicitDeclineInquiry, total)}</strong> transcripts explicitly asked why the client was hesitating before the veterinarian pivoted. The stronger pattern was recommendation followed by adjustment, not an early goals-and-limits conversation.`
+  },
+  {
+    title: 'Most visits did not become visible negotiation moments.',
+    body: `In <strong>${ratio(handCodedMetrics.firstRecommendationAccepted, total)}</strong> transcripts, the first recommendation was accepted. That matters because it means there were relatively few cases where the veterinarian had to visibly negotiate a second-best path.`
+  }
+];
+
+document.getElementById('keyFindings').innerHTML = keyFindings.map((item) => `
+  <article class="finding">
+    <h3 class="finding-title">${item.title}</h3>
+    <p>${item.body}</p>
+  </article>
+`).join('');
+
+function renderChart(targetId, rows) {
+  const root = document.getElementById(targetId);
+  root.innerHTML = rows.map((row) => {
+    const width = Math.max(4, (row.value / row.total) * 100);
+    return `
+      <div class="chart-row">
+        <div class="chart-label">${row.label}</div>
+        <div class="chart-track">
+          <div class="chart-fill ${row.tone}" style="width:${width}%"></div>
+        </div>
+        <div class="chart-value">${ratio(row.value, row.total)} (${percent(row.value, row.total)}%)</div>
+      </div>
+    `;
+  }).join('');
+}
+
+renderChart('primaryChart', [
+  { label: 'Options offered', value: handCodedMetrics.optionsOffered, total, tone: '' },
+  { label: 'Explicit money language', value: handCodedMetrics.moneyLanguage, total, tone: 'blue-mid' },
+  { label: 'Asked why before pivoting', value: handCodedMetrics.explicitDeclineInquiry, total, tone: 'red' },
+  { label: 'First recommendation accepted', value: handCodedMetrics.firstRecommendationAccepted, total, tone: 'gold' },
+  { label: 'No option needed', value: handCodedMetrics.noOptionButAppropriate, total, tone: 'blue-soft' }
+]);
+
+renderChart('careChart', [
+  { label: 'Staged tradeoffs', value: handCodedMetrics.stagedTradeoff, total, tone: '' },
+  { label: 'Pay or lower-cost logistics', value: handCodedMetrics.payRelatedOption, total, tone: 'blue-mid' },
+  { label: 'Risk of cheaper path explained', value: handCodedMetrics.riskExplained, total, tone: 'red' },
+  { label: 'Minimum responsible framing', value: handCodedMetrics.minimumResponsible, total, tone: 'gold' },
+  { label: 'Pharmacy savings', value: handCodedMetrics.pharmacySavings, total, tone: 'blue-soft' }
+]);
+
+document.getElementById('calloutBig').innerHTML =
+  `Most <span class="accent">care adaptation</span> in the ${total}-case sample looked staged and responsible, not hidden.`;
+
+document.getElementById('calloutBody').textContent =
+  'The strongest transcript pattern is staged care: narrower workups, home management when safe, cheaper logistics, and explicit explanation when a lower-intensity path needs caution. The rarer pattern is direct inquiry into the client\'s goals, limits, or reasons for hesitation.';
+
+const representativeExamples = [...handCodedTranscripts]
+  .filter((item) => item.tags.representative)
+  .sort((a, b) => representativeScore(b) - representativeScore(a) || Number(a.id) - Number(b.id))
+  .slice(0, 3);
+
+document.getElementById('exampleGrid').innerHTML = representativeExamples.map((item) => `
+  <article class="example-card">
+    <div class="example-id">Transcript ${escapeHtml(item.id)}</div>
+    <h3>${escapeHtml(item.pet)} · ${escapeHtml(item.species)}</h3>
+    <div class="example-visit">${escapeHtml(item.visit)}</div>
+    <div class="example-takeaway">${escapeHtml(item.takeaway)}</div>
+    <div class="badge-row">
+      ${getBadges(item).map((badge) => `<span class="badge">${escapeHtml(badge)}</span>`).join('')}
+    </div>
+  </article>
+`).join('');
+
+const implicationCards = [
+  {
+    title: 'What the sample supports',
+    body: `This ${total}-transcript review does not read like veterinarians are sitting on a hidden reservoir of easy, cheap medicine. It reads like clinicians often start close to the minimum responsible plan already, or they narrow the plan when needed.`
+  },
+  {
+    title: 'What still looks weak',
+    body: 'The thin spot is not option generation. It is explicit elicitation of goals, limits, and reasons for hesitation before the plan is revised. That is where communication training could likely sharpen the access-to-care conversation.'
+  },
+  {
+    title: 'Why this is a new evidence layer',
+    body: 'Survey work can show that a perception gap exists. Transcript analysis can show the mechanism underneath that gap by testing the actual sequence of cost talk, options, risk framing, and recommendation changes in the room.'
+  }
+];
+
+document.getElementById('implicationGrid').innerHTML = implicationCards.map((item) => `
+  <article class="implication-card">
+    <h3>${item.title}</h3>
+    <p>${item.body}</p>
+  </article>
+`).join('');
+
+const filterButtons = document.getElementById('filterButtons');
+filterButtons.innerHTML = FILTERS.map((filter) => `
+  <button class="filter-button${filter.key === state.filter ? ' active' : ''}" data-filter="${filter.key}">
+    ${filter.label}
+  </button>
+`).join('');
+
+filterButtons.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-filter]');
+  if (!button) return;
+  state.filter = button.dataset.filter;
+  document.querySelectorAll('.filter-button').forEach((node) => {
+    node.classList.toggle('active', node.dataset.filter === state.filter);
+  });
+  renderTranscripts();
+});
+
+document.getElementById('searchInput').addEventListener('input', (event) => {
+  state.search = event.target.value.trim().toLowerCase();
+  renderTranscripts();
+});
+
+document.getElementById('sortSelect').addEventListener('change', (event) => {
+  state.sort = event.target.value;
+  renderTranscripts();
+});
+
+function matchesFilter(item) {
+  if (state.filter === 'all') return true;
+  return Boolean(item.tags[state.filter]);
+}
+
+function matchesSearch(item) {
+  if (!state.search) return true;
+  const haystack = [
+    item.id,
+    item.pet,
+    item.species,
+    item.visit,
+    item.notes,
+    item.takeaway,
+    getBadges(item).join(' ')
+  ].join(' ').toLowerCase();
+  return haystack.includes(state.search);
+}
+
+function compareItems(a, b) {
+  if (state.sort === 'id') {
+    return Number(a.id) - Number(b.id);
+  }
+
+  if (state.sort === 'cost') {
+    const aScore = Number(a.tags.explicitMoneyLanguage) * 4 + Number(a.tags.payRelatedOption) * 2 + Number(a.tags.explicitDeclineInquiry);
+    const bScore = Number(b.tags.explicitMoneyLanguage) * 4 + Number(b.tags.payRelatedOption) * 2 + Number(b.tags.explicitDeclineInquiry);
+    if (bScore !== aScore) return bScore - aScore;
+  }
+
+  if (state.sort === 'representative') {
+    const aScore = Number(a.tags.representative) * 5 + Number(a.tags.explicitMoneyLanguage) * 3 + Number(a.tags.explicitDeclineInquiry) * 2 + Number(a.tags.riskExplained);
+    const bScore = Number(b.tags.representative) * 5 + Number(b.tags.explicitMoneyLanguage) * 3 + Number(b.tags.explicitDeclineInquiry) * 2 + Number(b.tags.riskExplained);
+    if (bScore !== aScore) return bScore - aScore;
+  }
+
+  return Number(a.id) - Number(b.id);
+}
+
+function renderTranscripts() {
+  const results = handCodedTranscripts
+    .filter(matchesFilter)
+    .filter(matchesSearch)
+    .sort(compareItems);
+
+  const activeLabel = FILTERS.find((filter) => filter.key === state.filter)?.label || 'All transcripts';
+  document.getElementById('resultsMeta').textContent =
+    `Showing ${results.length} of ${total} transcripts · Filter: ${activeLabel}`;
+
+  document.getElementById('transcriptGrid').innerHTML = results.map((item) => `
+    <article class="transcript-card">
+      <div class="transcript-top">
+        <div>
+          <div class="transcript-id">Transcript ${escapeHtml(item.id)}</div>
+          <h3>${escapeHtml(item.pet)} · ${escapeHtml(item.species)}</h3>
+          <div class="transcript-visit">${escapeHtml(item.visit)}</div>
+        </div>
+        <div class="accept-pill ${item.firstRecommendationAccepted ? 'yes' : 'no'}">
+          ${item.firstRecommendationAccepted ? '1st rec accepted' : '1st rec changed'}
+        </div>
+      </div>
+      <div class="badge-row">
+        ${getBadges(item).map((badge) => `<span class="badge">${escapeHtml(badge)}</span>`).join('')}
+      </div>
+      <div class="takeaway">${escapeHtml(item.takeaway)}</div>
+      <details class="notes-wrap">
+        <summary></summary>
+        <div class="notes">${escapeHtml(item.notes)}</div>
+      </details>
+      <div class="transcript-links">
+        <a class="text-link" href="${encodeURI(handCodedMemoPath)}">Open memo</a>
+      </div>
+    </article>
+  `).join('');
+}
+
+renderTranscripts();
+</script>
+</body>
+</html>
