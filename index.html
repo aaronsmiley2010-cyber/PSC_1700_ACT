@@ -78,6 +78,12 @@ body {
   line-height: 1.55;
 }
 
+.page-ribbon,
+.cover,
+#overview {
+  display: none;
+}
+
 a {
   color: inherit;
 }
@@ -246,7 +252,7 @@ a {
 
 .cover-meta {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   margin-top: 28px;
 }
@@ -273,6 +279,22 @@ a {
   font-size: 1.25rem;
 }
 
+.cover-stat .note {
+  display: block;
+  margin-top: 8px;
+  color: #5a6b7e;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.survey-inline {
+  color: var(--red);
+}
+
+.transcript-inline {
+  color: var(--blue-2);
+}
+
 .cover-chevron {
   position: absolute;
   right: 56px;
@@ -292,8 +314,8 @@ a {
 
 .toc {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 28px;
+  grid-template-columns: 1fr;
+  gap: 22px;
   margin-top: 24px;
   padding: 34px 36px;
   background: var(--paper);
@@ -329,6 +351,58 @@ a {
   gap: 12px 20px;
 }
 
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.quick-card {
+  padding: 22px 20px 18px;
+  border-radius: 20px;
+  border: 1px solid #dfe6ee;
+  background: #fbfcfe;
+}
+
+.quick-card h3 {
+  margin: 10px 0 8px;
+  color: #18293d;
+  font-size: 1.1rem;
+}
+
+.quick-stat {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.05;
+}
+
+.quick-body {
+  margin: 8px 0 0;
+  color: #4e6075;
+  line-height: 1.45;
+}
+
+.quick-script {
+  padding-top: 18px;
+  border-top: 1px solid #ebeff4;
+  color: #33485e;
+  font-size: 1.02rem;
+}
+
+.quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.compact-details {
+  margin-top: 6px;
+}
+
+.compact-details .appendix-body {
+  padding-top: 22px;
+}
+
 .toc-link {
   display: grid;
   grid-template-columns: 48px 1fr;
@@ -353,11 +427,15 @@ a {
 }
 
 .page {
-  margin-top: 24px;
-  padding: 34px 36px 40px;
+  margin-top: 28px;
+  padding: 40px 42px 46px;
   background: var(--paper);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+}
+
+#key-findings.page {
+  margin-top: 0;
 }
 
 .page.blue-page {
@@ -420,10 +498,18 @@ a {
 .lede {
   font-size: 1.06rem;
   color: #33465d;
+  max-width: 68ch;
 }
 
 .lede strong {
   color: #172739;
+}
+
+.sublede {
+  margin-top: 14px;
+  max-width: 62ch;
+  color: #5b6d81;
+  font-size: 0.96rem;
 }
 
 .meta-box {
@@ -460,13 +546,14 @@ a {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
   margin-top: 28px;
+  max-width: 980px;
 }
 
 .summary-card {
-  padding: 18px 18px 16px;
+  padding: 22px 20px 18px;
   border: 1px solid #e1e7ee;
   border-radius: 20px;
   background: #fff;
@@ -503,25 +590,27 @@ a {
   margin: 8px 0 0;
   color: var(--muted);
   font-size: 0.92rem;
+  max-width: 34ch;
 }
 
 .questions {
-  margin-top: 30px;
-  padding-top: 24px;
+  margin-top: 38px;
+  padding-top: 28px;
   border-top: 1px solid #ebeff4;
 }
 
 .evidence-shift {
-  margin-top: 30px;
-  padding-top: 24px;
+  margin-top: 38px;
+  padding-top: 28px;
   border-top: 1px solid #ebeff4;
 }
 
 .evidence-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 18px;
   margin-top: 16px;
+  max-width: 980px;
 }
 
 .evidence-card {
@@ -555,14 +644,199 @@ a {
   font-size: 1.08rem;
 }
 
-.evidence-list {
-  margin: 14px 0 0;
-  padding-left: 18px;
+.evidence-copy {
+  margin: 12px 0 0;
   color: #4e6075;
+  line-height: 1.6;
 }
 
-.evidence-list li + li {
+.compare-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.compare-chip.same {
+  background: #eaf7f3;
+  color: #2a6a5e;
+}
+
+.compare-chip.diff {
+  background: #fff3ed;
+  color: #b45d40;
+}
+
+.comparison-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.comparison-stat {
+  padding: 18px 18px 16px;
+  border-radius: 18px;
+  border: 1px solid #dfe6ee;
+}
+
+.comparison-stat.survey {
+  background: #fff6f1;
+  border-color: #f1ddd4;
+}
+
+.comparison-stat.transcript {
+  background: #f2fbf8;
+  border-color: #d1e9e2;
+}
+
+.comparison-source {
+  display: block;
+  color: #718092;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.comparison-value {
   margin-top: 8px;
+  color: #18293d;
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.comparison-stat.survey .comparison-value {
+  color: var(--red);
+}
+
+.comparison-stat.transcript .comparison-value {
+  color: var(--blue-2);
+}
+
+.comparison-label {
+  margin-top: 8px;
+  color: #4e6075;
+  line-height: 1.5;
+}
+
+.comparison-takeaway {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid #e3eaf1;
+  color: #375066;
+  line-height: 1.6;
+}
+
+.compare-board {
+  margin-top: 20px;
+  padding: 22px 20px 18px;
+  border-radius: 22px;
+  border: 1px solid #dfe6ee;
+  background: #fbfcfe;
+  max-width: 980px;
+}
+
+.compare-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.legend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #516275;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.legend-dot.survey {
+  background: var(--red);
+}
+
+.legend-dot.transcript {
+  background: var(--blue-2);
+}
+
+.paired-chart {
+  display: grid;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.paired-row {
+  display: grid;
+  gap: 10px;
+}
+
+.paired-label {
+  color: #243548;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.paired-bars {
+  display: grid;
+  gap: 10px;
+}
+
+.paired-bar-row {
+  display: grid;
+  grid-template-columns: 118px 1fr 64px;
+  gap: 12px;
+  align-items: center;
+}
+
+.paired-source {
+  color: #718092;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.paired-track {
+  position: relative;
+  height: 14px;
+  border-radius: 999px;
+  background: #edf2f8;
+  overflow: hidden;
+}
+
+.paired-fill {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  border-radius: 999px;
+}
+
+.paired-fill.survey {
+  background: var(--red);
+}
+
+.paired-fill.transcript {
+  background: var(--blue-2);
+}
+
+.paired-value {
+  text-align: right;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 
 .evidence-banner {
@@ -577,9 +851,10 @@ a {
 
 .question-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px 24px;
+  grid-template-columns: 1fr;
+  gap: 14px;
   margin-top: 14px;
+  max-width: 920px;
 }
 
 .question {
@@ -587,6 +862,10 @@ a {
   grid-template-columns: 34px 1fr;
   gap: 12px;
   align-items: start;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid #e1e7ee;
+  background: #fbfcfe;
   color: #394b61;
 }
 
@@ -603,7 +882,8 @@ a {
 
 .key-findings {
   display: grid;
-  gap: 24px;
+  gap: 30px;
+  max-width: 78ch;
 }
 
 .finding {
@@ -635,6 +915,24 @@ a {
 
 .chart-block {
   margin-top: 28px;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: 28px;
+}
+
+.mini-chart-card {
+  padding: 22px 20px 18px;
+  border-radius: 22px;
+  border: 1px solid #dfe6ee;
+  background: #fbfcfe;
+}
+
+.mini-chart-card .chart-desc {
+  margin-bottom: 14px;
 }
 
 .chart-kicker {
@@ -751,15 +1049,15 @@ a {
 }
 
 .examples {
-  margin-top: 34px;
-  padding-top: 28px;
+  margin-top: 40px;
+  padding-top: 30px;
   border-top: 1px solid #ebeff4;
 }
 
 .example-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
   margin-top: 16px;
 }
 
@@ -834,8 +1132,8 @@ a {
 
 .implication-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
 }
 
 .implication-card {
@@ -858,6 +1156,44 @@ a {
 
 .browser-title {
   color: #182a3d;
+}
+
+.appendix-wrap {
+  margin-top: 12px;
+  border: 1px solid #dce4ed;
+  border-radius: 24px;
+  background: #fbfcfe;
+  overflow: hidden;
+}
+
+.appendix-toggle {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  padding: 18px 22px;
+  cursor: pointer;
+  list-style: none;
+  color: #183046;
+  font-weight: 700;
+}
+
+.appendix-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.appendix-toggle-copy {
+  color: #647689;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.appendix-wrap[open] .appendix-toggle {
+  border-bottom: 1px solid #e5ebf2;
+}
+
+.appendix-body {
+  padding: 20px 22px 22px;
 }
 
 .browser-controls {
@@ -917,13 +1253,13 @@ a {
 
 .transcript-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 22px;
   margin-top: 18px;
 }
 
 .transcript-card {
-  padding: 18px;
+  padding: 20px;
   border-radius: 20px;
   border: 1px solid #dce4ed;
   background: #fbfcfe;
@@ -1016,6 +1352,26 @@ a {
   margin-top: 14px;
 }
 
+.load-more-wrap {
+  margin-top: 22px;
+}
+
+.load-more-button {
+  padding: 12px 16px;
+  border: 1px solid #d7dee7;
+  border-radius: 14px;
+  background: #fff;
+  color: #223549;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.load-more-button:hover {
+  border-color: var(--blue-2);
+  color: var(--blue-2);
+}
+
 .footer {
   margin-top: 26px;
   padding: 24px 0 8px;
@@ -1040,13 +1396,13 @@ a {
   }
 
   .summary-grid,
-  .implication-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
+  .quick-grid,
+  .implication-grid,
   .example-grid,
-  .evidence-grid {
-    grid-template-columns: 1fr;
+  .evidence-grid,
+  .comparison-stat-grid,
+  .chart-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .toc-links {
@@ -1079,8 +1435,13 @@ a {
 
   .cover-meta,
   .summary-grid,
+  .quick-grid,
   .implication-grid,
-  .question-grid {
+  .question-grid,
+  .example-grid,
+  .evidence-grid,
+  .comparison-stat-grid,
+  .chart-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1104,6 +1465,16 @@ a {
 
   .search-wrap {
     flex-direction: column;
+  }
+
+  .paired-bar-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .appendix-toggle {
+    flex-direction: column;
+    align-items: start;
   }
 
   .search-input {
@@ -1151,7 +1522,7 @@ a {
       <div class="cover-chip">Observed exam-room data</div>
     </div>
     <div class="cover-panel">
-      <h1 class="cover-title">What the Exam Room Shows</h1>
+      <h1 class="cover-title">Key Finding</h1>
       <p class="cover-subtitle" id="coverSubtitle"></p>
       <div class="cover-meta" id="coverMeta"></div>
     </div>
@@ -1162,87 +1533,79 @@ a {
     </div>
   </header>
 
-  <nav class="toc" aria-label="Table of contents">
-    <div>
-      <h2>Table of Contents</h2>
-      <p>
-        A publication-style view of the combined transcript review, organized around what was said in the exam room and what patterns emerged across the sample.
-      </p>
-    </div>
-    <div class="toc-links">
-      <a class="toc-link" href="#overview">
-        <strong>1</strong>
-        <div class="toc-copy">Overview and method</div>
-      </a>
-      <a class="toc-link" href="#key-findings">
-        <strong>2</strong>
-        <div class="toc-copy">Key findings</div>
-      </a>
-      <a class="toc-link" href="#detailed-findings">
-        <strong>3</strong>
-        <div class="toc-copy">Detailed findings and charts</div>
-      </a>
-      <a class="toc-link" href="#implications">
-        <strong>4</strong>
-        <div class="toc-copy">What the findings suggest</div>
-      </a>
-      <a class="toc-link" href="#appendix">
-        <strong>5</strong>
-        <div class="toc-copy">Appendix and transcript browser</div>
-      </a>
-      <a class="toc-link" href="#sources">
-        <strong>6</strong>
-        <div class="toc-copy">Sources and memo links</div>
-      </a>
-    </div>
-  </nav>
-
   <section class="page" id="overview">
     <div class="section-head">
       <span class="section-icon" aria-hidden="true"></span>
-      <h2 class="section-title">Overview</h2>
+      <h2 class="section-title">Visual Summary</h2>
     </div>
 
-    <div class="overview-grid">
-      <div>
-        <p class="lede" id="overviewLede"></p>
-        <p class="lede" id="overviewLedeTwo"></p>
-      </div>
-      <aside class="meta-box">
-        <h3>Method at a glance</h3>
-        <div class="meta-list">
-          <div class="meta-item">
-            <div class="meta-label">Source</div>
-            <div>Point 4 source sample plus additional non-overlapping AI-coded transcript batches</div>
-          </div>
-          <div class="meta-item">
-            <div class="meta-label">Unit</div>
-            <div>Observed exam-room conversations, AI-coded at transcript level using a fixed rubric rather than recalled later in a survey</div>
-          </div>
-          <div class="meta-item">
-            <div class="meta-label">Codes</div>
-            <div>Options offered, money language, decline inquiry, staged care, risk explanation, minimum responsible care</div>
-          </div>
-          <div class="meta-item">
-            <div class="meta-label">Caveat</div>
-            <div id="sampleNote"></div>
-          </div>
-        </div>
-      </aside>
-    </div>
-
-    <div class="summary-grid" id="summaryGrid"></div>
-
-    <div class="questions">
-      <h3 class="subsection-title">Questions this transcript evidence can answer directly</h3>
-      <div class="question-grid" id="questionGrid"></div>
-    </div>
-
-    <div class="evidence-shift">
-      <h3 class="subsection-title">Why this evidence is different</h3>
-      <div class="evidence-grid" id="evidenceGrid"></div>
+    <div class="evidence-shift" style="margin-top:0;padding-top:0;border-top:none;">
+      <h3 class="subsection-title">Gallup vs VetSOAP</h3>
       <div class="evidence-banner" id="evidenceBanner"></div>
+      <div class="compare-board">
+        <div class="chart-kicker">Visual Compare</div>
+        <h3 class="chart-title">Four comparisons that matter</h3>
+        <p class="chart-desc">
+          This is the fastest way to see where the survey and the transcript evidence line up, and where the transcript layer changes the interpretation.
+        </p>
+        <div class="compare-legend">
+          <span class="legend-pill"><span class="legend-dot survey"></span>Gallup survey</span>
+          <span class="legend-pill"><span class="legend-dot transcript"></span>VetSOAP transcripts</span>
+        </div>
+        <div class="paired-chart" id="gallupCompareChart"></div>
+      </div>
     </div>
+
+    <details class="appendix-wrap compact-details">
+      <summary class="appendix-toggle">
+        <span>Open method and coding detail</span>
+        <span class="appendix-toggle-copy">Keep this closed unless someone asks how the transcript layer was built or what it measured.</span>
+      </summary>
+      <div class="appendix-body">
+        <div class="overview-grid">
+          <div>
+            <p class="lede" id="overviewLede"></p>
+            <p class="sublede" id="overviewLedeTwo"></p>
+          </div>
+          <aside class="meta-box">
+            <h3>Method at a glance</h3>
+            <div class="meta-list">
+              <div class="meta-item">
+                <div class="meta-label">Source</div>
+                <div>Point 4 source sample plus additional non-overlapping AI-coded transcript batches</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Unit</div>
+                <div>Observed exam-room conversations, AI-coded at transcript level using a fixed rubric rather than recalled later in a survey</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Codes</div>
+                <div>Options offered, money language, decline inquiry, staged care, risk explanation, minimum responsible care</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Caveat</div>
+                <div id="sampleNote"></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="summary-grid" id="summaryGrid"></div>
+
+        <div class="questions">
+          <details class="appendix-wrap">
+            <summary class="appendix-toggle">
+              <span>Open the analytic questions behind this report</span>
+              <span class="appendix-toggle-copy">Open only if someone asks what the transcript layer can answer directly.</span>
+            </summary>
+            <div class="appendix-body">
+              <h3 class="subsection-title">Three questions transcript evidence can answer directly</h3>
+              <div class="question-grid" id="questionGrid"></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </details>
   </section>
 
   <section class="page blue-page" id="key-findings">
@@ -1282,6 +1645,26 @@ a {
       <div class="chart" id="careChart"></div>
     </article>
 
+    <div class="chart-grid">
+      <article class="mini-chart-card">
+        <div class="chart-kicker">Chart 3</div>
+        <h3 class="chart-title">What Became Visible in the Room</h3>
+        <p class="chart-desc">
+          Visible care adaptation was much more common than direct budget language.
+        </p>
+        <div class="chart" id="visibilityChart"></div>
+      </article>
+
+      <article class="mini-chart-card">
+        <div class="chart-kicker">Chart 4</div>
+        <h3 class="chart-title">Where the Sequence Stayed Weak</h3>
+        <p class="chart-desc">
+          Most visits ended with the first plan accepted, while explicit up-front constraint elicitation was rare.
+        </p>
+        <div class="chart" id="sequenceChart"></div>
+      </article>
+    </div>
+
     <section class="examples">
       <h3 class="subsection-title">Illustrative transcripts</h3>
       <p class="chart-desc">
@@ -1305,32 +1688,42 @@ a {
       <h2 class="section-title appendix-title">Appendix: Transcript Browser</h2>
     </div>
 
-    <h3 class="browser-title">Browse the AI-coded transcript set</h3>
-    <p class="chart-desc">
-      Filter the appendix by the transcript-level signals that matter most to the combined findings across the reviewed sample.
-    </p>
+    <details class="appendix-wrap">
+      <summary class="appendix-toggle">
+        <span>Open the case-level appendix</span>
+        <span class="appendix-toggle-copy">Use filters only if you need transcript-level examples behind the report.</span>
+      </summary>
+      <div class="appendix-body">
+        <h3 class="browser-title">Browse the AI-coded transcript set</h3>
+        <p class="chart-desc">
+          Filter the appendix by the transcript-level signals that matter most to the combined findings across the reviewed sample.
+        </p>
 
-    <div class="browser-controls">
-      <div class="control-row" id="filterButtons"></div>
-      <div class="search-wrap">
-        <select class="sort-select" id="sortSelect" aria-label="Sort transcripts">
-          <option value="representative">Representative first</option>
-          <option value="cost">Cost language first</option>
-          <option value="id">Transcript ID</option>
-        </select>
-        <input class="search-input" id="searchInput" type="search" placeholder="Search pet, visit, note, or transcript ID" aria-label="Search transcripts">
+        <div class="browser-controls">
+          <div class="control-row" id="filterButtons"></div>
+          <div class="search-wrap">
+            <select class="sort-select" id="sortSelect" aria-label="Sort transcripts">
+              <option value="representative">Representative first</option>
+              <option value="cost">Cost language first</option>
+              <option value="id">Transcript ID</option>
+            </select>
+            <input class="search-input" id="searchInput" type="search" placeholder="Search pet, visit, note, or transcript ID" aria-label="Search transcripts">
+          </div>
+        </div>
+
+        <div class="results-meta" id="resultsMeta"></div>
+        <div class="transcript-grid" id="transcriptGrid"></div>
+        <div class="load-more-wrap" id="loadMoreWrap"></div>
       </div>
-    </div>
-
-    <div class="results-meta" id="resultsMeta"></div>
-    <div class="transcript-grid" id="transcriptGrid"></div>
+    </details>
   </section>
 
   <footer class="footer" id="sources">
-    <p>This shareable web version includes the VetSOAP AI-coded transcript review of the 1700 analyzed cases. Raw transcript files are not included in this public bundle.</p>
+    <p>This report view includes only the VetSOAP AI-coded transcript review of the 1700 analyzed cases.</p>
     <div class="footer-links">
       <a class="text-link" id="baseMemoLink" href="#">Open findings memo</a>
       <a class="text-link" id="sourceLink" href="#">Open Point 4 source</a>
+      <a class="text-link" id="gallupLink" href="#">Open Gallup survey report</a>
     </div>
   </footer>
 </div>
@@ -1375,7 +1768,8 @@ const FILTERS = [
 const state = {
   filter: 'all',
   search: '',
-  sort: 'representative'
+  sort: 'representative',
+  visibleCount: 24
 };
 
 function percent(value, total) {
@@ -1405,6 +1799,10 @@ function displayPercent(value, total) {
     return `${raw.toFixed(1)}%`;
   }
   return `${Math.round(raw)}%`;
+}
+
+function rawPercent(value, total) {
+  return (value / total) * 100;
 }
 
 const BADGE_CONFIG = [
@@ -1463,25 +1861,37 @@ const inquiryPercent = percent(handCodedMetrics.explicitDeclineInquiry, total);
 const stagedPercent = percent(handCodedMetrics.stagedTradeoff, total);
 
 document.getElementById('coverSubtitle').textContent =
-  `Across ${total} processed exam-room transcripts, options and staged tradeoffs were common, explicit cost language was less common, and budget-first questioning was rare.`;
+  `Across ${total} exam-room transcripts, the dominant pattern was responsible staged care, not withheld affordable options.`;
 
 document.getElementById('coverMeta').innerHTML = [
-  { label: 'Processed sample', value: `${total} reviewed` },
-  { label: 'Evidence type', value: 'Observed conversations' },
-  { label: 'Options offered', value: ratio(handCodedMetrics.optionsOffered, total) },
-  { label: 'Cost explicit', value: ratio(handCodedMetrics.moneyLanguage, total) }
+  {
+    label: 'Options were visible',
+    value: `<span class="transcript-inline">${displayPercent(handCodedMetrics.optionsOffered, total)}</span>`,
+    note: 'Alternatives or a clear option set appeared in most observed conversations.'
+  },
+  {
+    label: 'Staged tradeoffs were common',
+    value: `<span class="transcript-inline">${displayPercent(handCodedMetrics.stagedTradeoff, total)}</span>`,
+    note: 'Affordable care usually looked like staging, narrowing, or safer lower-intensity paths.'
+  },
+  {
+    label: 'The weak spot was sequencing',
+    value: `<span class="transcript-inline">${displayPercent(handCodedMetrics.explicitDeclineInquiry, total)}</span>`,
+    note: 'Explicit “asked why first” conversations were almost absent before the recommendation was presented.'
+  }
 ].map((item) => `
   <div class="cover-stat">
     <span class="label">${item.label}</span>
     <strong>${item.value}</strong>
+    <span class="note">${item.note}</span>
   </div>
 `).join('');
 
 document.getElementById('overviewLede').innerHTML =
-  `<strong>This interface is organized as a VetSOAP findings report built only from the AI-coded transcript set.</strong> The analysis reads the exam room directly by applying a fixed coding rubric to ${total} actual transcripts for cost language, alternatives, staged care, decline inquiry, and minimum responsible care patterns.`;
+  `<strong>This report is built only from the VetSOAP AI-coded transcript set.</strong> It reads the exam room directly across ${total} actual conversations for cost language, alternatives, staged care, decline inquiry, and minimum responsible care patterns.`;
 
 document.getElementById('overviewLedeTwo').innerHTML =
-  `That matters because many access-to-care questions are usually argued from perception, memory, or professional intuition. This dataset tests those questions against observed exam-room behavior: what was said, when it was said, and how the plan changed.`;
+  `Read alongside the Gallup survey, the transcript layer sharpens the main question: does the room look like withheld affordable care, or does it look like clinicians already trying to adapt care within limits?`;
 
 document.getElementById('sampleNote').textContent =
   `This report includes the original Point 4 50-case sample, a second non-overlapping 50-case seeded batch, and ${Math.max(handCodedBatches.length - 2, 0)} additional non-overlapping 100-case AI-coded batches, for a combined ${total}-transcript AI-coded sample. This layer is not yet independently human-validated.`;
@@ -1489,6 +1899,7 @@ document.getElementById('sampleNote').textContent =
 document.getElementById('baseMemoLink').href = encodeURI(handCodedMemoPath);
 document.getElementById('baseMemoLink').textContent = `Open ${total}-case findings memo`;
 document.getElementById('sourceLink').href = encodeURI(analysis.meta.sourcePage);
+document.getElementById('gallupLink').href = encodeURI('Gallup-PSC-Vet_Survey-Report.pdf');
 
 const summaryCards = [
   {
@@ -1500,13 +1911,13 @@ const summaryCards = [
   {
     value: displayPercent(handCodedMetrics.moneyLanguage, total),
     label: 'Explicit money language',
-    note: `${countOf(handCodedMetrics.moneyLanguage, total)} transcripts made affordability verbal and visible in the room.`,
+    note: `${countOf(handCodedMetrics.moneyLanguage, total)} transcripts made affordability explicit in the room.`,
     tone: 'red'
   },
   {
     value: displayPercent(handCodedMetrics.explicitDeclineInquiry, total),
     label: 'Asked why first',
-    note: `${countOf(handCodedMetrics.explicitDeclineInquiry, total)} transcripts explicitly explored the reason for hesitation before pivoting.`,
+    note: `${countOf(handCodedMetrics.explicitDeclineInquiry, total)} transcripts explored the reason for hesitation before pivoting.`,
     tone: 'gold'
   },
   {
@@ -1525,7 +1936,7 @@ document.getElementById('summaryGrid').innerHTML = summaryCards.map((item) => `
   </article>
 `).join('');
 
-document.getElementById('questionGrid').innerHTML = analysis.questions.map((question, index) => `
+document.getElementById('questionGrid').innerHTML = analysis.questions.slice(0, 3).map((question, index) => `
   <div class="question">
     <div class="question-number">${index + 1}</div>
     <div>${escapeHtml(question)}</div>
@@ -1534,54 +1945,89 @@ document.getElementById('questionGrid').innerHTML = analysis.questions.map((ques
 
 const evidenceCards = [
   {
-    tone: 'survey',
-    kicker: 'Surveys and perception studies',
-    title: 'Useful for showing what people believe happened',
-    bullets: [
-      'They can reveal perception gaps, disagreement, and how each side remembers the conversation.',
-      'They cannot reliably show who raised cost first, when options were offered, or how the recommendation changed in sequence.'
-    ]
+    tone: '',
+    chip: 'same',
+    chipLabel: 'Aligned finding',
+    title: 'Options are common in both datasets',
+    surveyValue: '64%',
+    surveyLabel: 'Gallup: vets who say they usually suggest multiple care options.',
+    transcriptValue: displayPercent(handCodedMetrics.optionsOffered, total),
+    transcriptLabel: `VetSOAP: transcripts with options or a clear option set (${countOf(handCodedMetrics.optionsOffered, total)}).`,
+    takeaway: 'Both evidence layers point away from a one-plan-only picture of care.'
   },
   {
-    tone: 'transcript',
-    kicker: 'VetSOAP transcript analysis',
-    title: 'Useful for showing what actually happened in the room',
-    bullets: [
-      'It can test whether cost was named, who introduced it, whether alternatives were offered, and how risk or uncertainty was explained.',
-      'It can locate the exact communication moment where the plan narrowed, adapted, or failed to surface goals and limits.'
-    ]
+    tone: '',
+    chip: 'same',
+    chipLabel: 'Aligned finding',
+    title: 'Both studies point to care adaptation after constraints',
+    surveyValue: '81%',
+    surveyLabel: 'Gallup: vets who say they often or always recommend an alternative plan after cost-based decline.',
+    transcriptValue: displayPercent(handCodedMetrics.stagedTradeoff, total),
+    transcriptLabel: `VetSOAP: transcripts showing staged tradeoffs or narrowed plans (${countOf(handCodedMetrics.stagedTradeoff, total)}).`,
+    takeaway: 'The transcript layer makes the adaptation visible: staging, narrower workups, home management, and safety framing.'
+  },
+  {
+    tone: '',
+    chip: 'diff',
+    chipLabel: 'Different emphasis',
+    title: 'Cost pressure is broader than explicit cost talk',
+    surveyValue: '94%',
+    surveyLabel: 'Gallup: vets who say financial challenges sometimes or often limit care.',
+    transcriptValue: displayPercent(handCodedMetrics.moneyLanguage, total),
+    transcriptLabel: `VetSOAP: transcripts where money or affordability was made explicit in the room (${countOf(handCodedMetrics.moneyLanguage, total)}).`,
+    takeaway: 'Together these suggest cost affects care far more often than it is verbally named during the visit.'
+  },
+  {
+    tone: '',
+    chip: 'diff',
+    chipLabel: 'Different emphasis',
+    title: 'Early budget discovery looks rarer in observed conversations',
+    surveyValue: '17%',
+    surveyLabel: 'Gallup: vets who say they try to understand financial concerns before recommending care.',
+    transcriptValue: displayPercent(handCodedMetrics.explicitDeclineInquiry, total),
+    transcriptLabel: `VetSOAP: transcripts with an explicit “asked why first” move before pivoting (${countOf(handCodedMetrics.explicitDeclineInquiry, total)}).`,
+    takeaway: 'Both point to a sequencing gap, but the transcript layer makes it visually stark: up-front constraint elicitation almost never appeared as an observable first move.'
   }
 ];
 
-document.getElementById('evidenceGrid').innerHTML = evidenceCards.map((item) => `
-  <article class="evidence-card ${item.tone}">
-    <div class="evidence-kicker">${item.kicker}</div>
-    <h4>${item.title}</h4>
-    <ul class="evidence-list">
-      ${item.bullets.map((bullet) => `<li>${bullet}</li>`).join('')}
-    </ul>
-  </article>
-`).join('');
+const evidenceGrid = document.getElementById('evidenceGrid');
+if (evidenceGrid) {
+  evidenceGrid.innerHTML = evidenceCards.map((item) => `
+    <article class="evidence-card ${item.tone}">
+      <span class="compare-chip ${item.chip}">${item.chipLabel}</span>
+      <h4>${item.title}</h4>
+      <div class="comparison-stat-grid">
+        <div class="comparison-stat survey">
+          <span class="comparison-source">Gallup survey</span>
+          <div class="comparison-value">${item.surveyValue}</div>
+          <div class="comparison-label">${item.surveyLabel}</div>
+        </div>
+        <div class="comparison-stat transcript">
+          <span class="comparison-source">VetSOAP transcripts</span>
+          <div class="comparison-value">${item.transcriptValue}</div>
+          <div class="comparison-label">${item.transcriptLabel}</div>
+        </div>
+      </div>
+      <p class="comparison-takeaway"><strong>What this changes:</strong> ${item.takeaway}</p>
+    </article>
+  `).join('');
+}
 
 document.getElementById('evidenceBanner').innerHTML =
-  `<strong>Survey evidence shows the perception gap.</strong> VetSOAP transcript analysis shows the mechanism: what was said, in what order, and how the care plan adapted across ${total} AI-coded transcripts.`;
+  `<strong>Gallup and VetSOAP are complementary, not competing.</strong> These rows pair matched themes, not identical survey items. Gallup shows self-reported beliefs, training gaps, and emotional strain. VetSOAP shows the visible exam-room sequence: what was said, when options appeared, and how the plan changed across ${total} AI-coded transcripts.`;
 
 const keyFindings = [
   {
     title: 'Options and alternatives were common.',
-    body: `Options or alternatives appeared in <strong>${ratio(handCodedMetrics.optionsOffered, total)}</strong> transcripts. The <strong>${ratio(handCodedMetrics.noOptionButAppropriate, total)}</strong> with no meaningful options were mostly routine wellness, follow-up, or note-style cases where an option set was not really the issue.`
+    body: `Options or alternatives appeared in <strong>${ratio(handCodedMetrics.optionsOffered, total)}</strong> transcripts. Cases with no meaningful options were usually routine or note-style visits, not obvious missed affordability moments.`
   },
   {
     title: 'Care adaptation was more visible than cost talk.',
-    body: `Only <strong>${ratio(handCodedMetrics.moneyLanguage, total)}</strong> transcripts used clear money-related language, while <strong>${ratio(handCodedMetrics.payRelatedOption, total)}</strong> included pay or lower-cost logistics moves. That suggests affordability may shape plans even when the room does not openly name budget.`
+    body: `Only <strong>${ratio(handCodedMetrics.moneyLanguage, total)}</strong> transcripts used clear money-related language, while <strong>${ratio(handCodedMetrics.stagedTradeoff, total)}</strong> showed staged tradeoffs. Cost often shaped care without being named directly.`
   },
   {
     title: 'The main communication gap was values elicitation.',
-    body: `Only <strong>${ratio(handCodedMetrics.explicitDeclineInquiry, total)}</strong> transcripts explicitly asked why the client was hesitating before the veterinarian pivoted. The stronger pattern was recommendation followed by adjustment, not an early goals-and-limits conversation.`
-  },
-  {
-    title: 'Most visits did not become visible negotiation moments.',
-    body: `In <strong>${ratio(handCodedMetrics.firstRecommendationAccepted, total)}</strong> transcripts, the first recommendation was accepted. That matters because it means there were relatively few cases where the veterinarian had to visibly negotiate a second-best path.`
+    body: `Only <strong>${ratio(handCodedMetrics.explicitDeclineInquiry, total)}</strong> transcripts explicitly asked why the client was hesitating before the veterinarian pivoted. The stronger pattern was recommendation first, adjustment second.`
   }
 ];
 
@@ -1591,6 +2037,31 @@ document.getElementById('keyFindings').innerHTML = keyFindings.map((item) => `
     <p>${item.body}</p>
   </article>
 `).join('');
+
+function renderPairedChart(targetId, rows) {
+  const root = document.getElementById(targetId);
+  root.innerHTML = rows.map((row) => `
+    <div class="paired-row">
+      <div class="paired-label">${row.label}</div>
+      <div class="paired-bars">
+        <div class="paired-bar-row">
+          <div class="paired-source">Gallup</div>
+          <div class="paired-track">
+            <div class="paired-fill survey" style="width:${Math.max(4, row.survey)}%"></div>
+          </div>
+          <div class="paired-value">${row.surveyLabel}</div>
+        </div>
+        <div class="paired-bar-row">
+          <div class="paired-source">VetSOAP</div>
+          <div class="paired-track">
+            <div class="paired-fill transcript" style="width:${Math.max(4, row.transcript)}%"></div>
+          </div>
+          <div class="paired-value">${row.transcriptLabel}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
 
 function renderChart(targetId, rows) {
   const root = document.getElementById(targetId);
@@ -1608,6 +2079,37 @@ function renderChart(targetId, rows) {
   }).join('');
 }
 
+renderPairedChart('gallupCompareChart', [
+  {
+    label: 'Options or alternatives available',
+    survey: 64,
+    surveyLabel: '64%',
+    transcript: rawPercent(handCodedMetrics.optionsOffered, total),
+    transcriptLabel: displayPercent(handCodedMetrics.optionsOffered, total)
+  },
+  {
+    label: 'Care adaptation after constraint',
+    survey: 81,
+    surveyLabel: '81%',
+    transcript: rawPercent(handCodedMetrics.stagedTradeoff, total),
+    transcriptLabel: displayPercent(handCodedMetrics.stagedTradeoff, total)
+  },
+  {
+    label: 'Cost pressure vs cost named aloud',
+    survey: 94,
+    surveyLabel: '94%',
+    transcript: rawPercent(handCodedMetrics.moneyLanguage, total),
+    transcriptLabel: displayPercent(handCodedMetrics.moneyLanguage, total)
+  },
+  {
+    label: 'Before-recommendation financial discovery',
+    survey: 17,
+    surveyLabel: '17%',
+    transcript: rawPercent(handCodedMetrics.explicitDeclineInquiry, total),
+    transcriptLabel: displayPercent(handCodedMetrics.explicitDeclineInquiry, total)
+  }
+]);
+
 renderChart('primaryChart', [
   { label: 'Options offered', value: handCodedMetrics.optionsOffered, total, tone: '' },
   { label: 'Explicit money language', value: handCodedMetrics.moneyLanguage, total, tone: 'blue-mid' },
@@ -1624,6 +2126,22 @@ renderChart('careChart', [
   { label: 'Pharmacy savings', value: handCodedMetrics.pharmacySavings, total, tone: 'blue-soft' }
 ]);
 
+renderChart('visibilityChart', [
+  { label: 'Staged tradeoffs', value: handCodedMetrics.stagedTradeoff, total, tone: '' },
+  { label: 'Options offered', value: handCodedMetrics.optionsOffered, total, tone: 'blue-mid' },
+  { label: 'Risk explained', value: handCodedMetrics.riskExplained, total, tone: 'red' },
+  { label: 'Explicit money language', value: handCodedMetrics.moneyLanguage, total, tone: 'gold' },
+  { label: 'Pay or lower-cost logistics', value: handCodedMetrics.payRelatedOption, total, tone: 'blue-soft' }
+]);
+
+renderChart('sequenceChart', [
+  { label: 'First recommendation accepted', value: handCodedMetrics.firstRecommendationAccepted, total, tone: 'gold' },
+  { label: 'No option needed', value: handCodedMetrics.noOptionButAppropriate, total, tone: 'blue-soft' },
+  { label: 'Minimum responsible framing', value: handCodedMetrics.minimumResponsible, total, tone: 'blue-mid' },
+  { label: 'Barrier detected', value: handCodedMetrics.barrierDetected, total, tone: 'red' },
+  { label: 'Asked why first', value: handCodedMetrics.explicitDeclineInquiry, total, tone: '' }
+]);
+
 document.getElementById('calloutBig').innerHTML =
   `Most <span class="accent">care adaptation</span> in the ${total}-case sample looked staged and responsible, not hidden.`;
 
@@ -1633,7 +2151,7 @@ document.getElementById('calloutBody').textContent =
 const representativeExamples = [...handCodedTranscripts]
   .filter((item) => item.tags.representative)
   .sort((a, b) => representativeScore(b) - representativeScore(a) || Number(a.id) - Number(b.id))
-  .slice(0, 3);
+  .slice(0, 2);
 
 document.getElementById('exampleGrid').innerHTML = representativeExamples.map((item) => `
   <article class="example-card">
@@ -1643,6 +2161,9 @@ document.getElementById('exampleGrid').innerHTML = representativeExamples.map((i
     <div class="example-takeaway">${escapeHtml(item.takeaway)}</div>
     <div class="badge-row">
       ${getBadges(item).map((badge) => `<span class="badge">${escapeHtml(badge)}</span>`).join('')}
+    </div>
+    <div class="example-links" style="margin-top:14px;">
+      <a class="text-link" href="${encodeURI(item.transcriptPath)}">Open transcript</a>
     </div>
   </article>
 `).join('');
@@ -1655,10 +2176,6 @@ const implicationCards = [
   {
     title: 'What still looks weak',
     body: 'The thin spot is not option generation. It is explicit elicitation of goals, limits, and reasons for hesitation before the plan is revised. That is where communication training could likely sharpen the access-to-care conversation.'
-  },
-  {
-    title: 'Why this is a new evidence layer',
-    body: 'Survey work can show that a perception gap exists. Transcript analysis can show the mechanism underneath that gap by testing the actual sequence of cost talk, options, risk framing, and recommendation changes in the room.'
   }
 ];
 
@@ -1680,6 +2197,7 @@ filterButtons.addEventListener('click', (event) => {
   const button = event.target.closest('[data-filter]');
   if (!button) return;
   state.filter = button.dataset.filter;
+  state.visibleCount = 24;
   document.querySelectorAll('.filter-button').forEach((node) => {
     node.classList.toggle('active', node.dataset.filter === state.filter);
   });
@@ -1688,11 +2206,20 @@ filterButtons.addEventListener('click', (event) => {
 
 document.getElementById('searchInput').addEventListener('input', (event) => {
   state.search = event.target.value.trim().toLowerCase();
+  state.visibleCount = 24;
   renderTranscripts();
 });
 
 document.getElementById('sortSelect').addEventListener('change', (event) => {
   state.sort = event.target.value;
+  state.visibleCount = 24;
+  renderTranscripts();
+});
+
+document.getElementById('loadMoreWrap').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-load-more]');
+  if (!button) return;
+  state.visibleCount += 24;
   renderTranscripts();
 });
 
@@ -1740,12 +2267,13 @@ function renderTranscripts() {
     .filter(matchesFilter)
     .filter(matchesSearch)
     .sort(compareItems);
+  const visibleResults = results.slice(0, state.visibleCount);
 
   const activeLabel = FILTERS.find((filter) => filter.key === state.filter)?.label || 'All transcripts';
   document.getElementById('resultsMeta').textContent =
-    `Showing ${results.length} of ${total} transcripts · Filter: ${activeLabel}`;
+    `Showing ${visibleResults.length} of ${results.length} matching transcripts · Filter: ${activeLabel}`;
 
-  document.getElementById('transcriptGrid').innerHTML = results.map((item) => `
+  document.getElementById('transcriptGrid').innerHTML = visibleResults.map((item) => `
     <article class="transcript-card">
       <div class="transcript-top">
         <div>
@@ -1766,10 +2294,17 @@ function renderTranscripts() {
         <div class="notes">${escapeHtml(item.notes)}</div>
       </details>
       <div class="transcript-links">
+        <a class="text-link" href="${encodeURI(item.transcriptPath)}">Open transcript</a>
         <a class="text-link" href="${encodeURI(handCodedMemoPath)}">Open memo</a>
       </div>
     </article>
   `).join('');
+
+  document.getElementById('loadMoreWrap').innerHTML = results.length > visibleResults.length ? `
+    <button class="load-more-button" type="button" data-load-more>
+      Show ${Math.min(24, results.length - visibleResults.length)} more transcripts
+    </button>
+  ` : '';
 }
 
 renderTranscripts();
